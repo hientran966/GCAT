@@ -15,20 +15,21 @@ const baseController = createController(ProductService, {
 
 const customMethods = {
     create: async (req, res, next) => {
-    try {
-        const service = new ProductService(MySQL.pool);
-        const payload = {
-            ...req.body,
-            file: req.file,
-            file_name: req.file?.originalname
-        };
+        try {
+            const service = new ProductService(MySQL.pool);
+            const payload = {
+                ...req.body,
+                file: req.file,
+                file_name: req.file?.originalname
+            };
 
-        const result = await service.create(payload);
-        res.send(result);
-    } catch (err) {
-        next(err);
+            const result = await service.create(payload);
+            res.send(result);
+        } catch (err) {
+            console.error("Create product error:", err);
+            next(new ApiError(401, err.message || "Tạo sản phẩm không thành công"));
+        }
     }
-}
 };
 
 module.exports = {

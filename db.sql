@@ -35,6 +35,7 @@ CREATE TABLE product_stages (
     stage_name VARCHAR(255) NOT NULL,       -- tên công đoạn
     price DECIMAL(10,2) NOT NULL,           -- giá trả cho công đoạn
     stage_quantity INT NOT NULL,            -- SL yêu cầu trong công đoạn
+	image_url VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     deleted_at TIMESTAMP NULL,
     FOREIGN KEY (product_id) REFERENCES products(id)

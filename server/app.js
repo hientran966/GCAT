@@ -6,6 +6,9 @@ const { verifyToken } = require("./app/middlewares/auth.middleware");
 
 const accountRouter = require("./app/routes/Account.route");
 const productRouter = require("./app/routes/Product.route");
+const stageRouter = require("./app/routes/Stage.route");
+const assignRouter = require("./app/routes/Assign.route");
+
 const app = express();
 
 app.use(cors());
@@ -20,6 +23,8 @@ app.use("/api/accounts", accountRouter);
 
 //app.use(verifyToken);
 app.use("/api/products", productRouter);
+app.use("/api/stages", stageRouter);
+app.use("/api/assigns", assignRouter);
 
 //handle 404
 app.use((req, res, next) => {
