@@ -1,9 +1,9 @@
 const { createController } = require("./controllerFactory");
-const AuthService = require("../services/Product.service");
+const ProductService = require("../services/Product.service");
 const ApiError = require("../api-error");
 const MySQL = require("../utils/mysql.util");
 
-const baseController = createController(AuthService, {
+const baseController = createController(ProductService, {
     create: "Có lỗi xảy ra khi tạo sản phẩm",
     findAll: "Có lỗi xảy ra khi lấy danh sách sản phẩm",
     findOne: "Có lỗi xảy ra khi lấy sản phẩm",
@@ -14,7 +14,21 @@ const baseController = createController(AuthService, {
 });
 
 const customMethods = {
-    
+    create: async (req, res, next) => {
+    try {
+        const service = new ProductService(MySQL.pool);
+        const payload = {
+            ...req.body,
+            file: req.file,
+            file_name: req.file?.originalname
+        };
+
+        const result = await service.create(payload);
+        res.send(result);
+    } catch (err) {
+        next(err);
+    }
+}
 };
 
 module.exports = {

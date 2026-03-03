@@ -1,0 +1,154 @@
+{
+  "info": {
+    "name": "GCAT API",
+    "description": "Collection for GCAT project endpoints",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Accounts",
+      "item": [
+        {
+          "name": "Create Account",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Nguyen Van A\",\n  \"phone\": \"0912345678\",\n  \"password\": \"Secret123!\",\n  \"role\": \"account\",\n  \"address\": \"Hanoi, Vietnam\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/accounts",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "accounts"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"0912345678\",\n  \"Password\": \"Secret123!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/accounts/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "accounts",
+                "login"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Products",
+      "item": [
+        {
+          "name": "Create Product (with file)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "code",
+                  "value": "P001",
+                  "type": "text"
+                },
+                {
+                  "key": "name",
+                  "value": "Sample Product",
+                  "type": "text"
+                },
+                {
+                  "key": "total_quantity",
+                  "value": "100",
+                  "type": "text"
+                },
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": ""  
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/products",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "products"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Product",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "Updated Product",
+                  "type": "text"
+                },
+                {
+                  "key": "total_quantity",
+                  "value": "150",
+                  "type": "text"
+                },
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": ""  
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/products/1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "products",
+                "1"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000"
+    }
+  ]
+}

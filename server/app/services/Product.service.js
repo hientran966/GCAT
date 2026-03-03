@@ -33,8 +33,9 @@ class ProductService {
       throw new Error("Không tìm thấy file để lưu.");
     }
 
-    const ext = path.extname(payload.file_name);
-    const baseName = path.basename(payload.file_name, ext);
+    const originalname = payload.file.originalname;
+    const ext = path.extname(originalname);
+    const baseName = path.basename(originalname, ext);
     const uniqueName = `${baseName}_${Date.now()}${ext}`;
     const destPath = path.join(uploadDir, uniqueName);
     fs.copyFileSync(sourcePath, destPath);

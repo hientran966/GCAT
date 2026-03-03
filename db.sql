@@ -21,6 +21,7 @@ CREATE TABLE products (
     code VARCHAR(100) UNIQUE NOT NULL,      -- mã sản phẩm
     name VARCHAR(255) NOT NULL,
     total_quantity INT NOT NULL,            -- tổng số lượng phải làm
+    image_url VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     deleted_at TIMESTAMP NULL

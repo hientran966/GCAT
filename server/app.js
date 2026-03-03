@@ -23,13 +23,13 @@ app.use("/api/products", productRouter);
 
 //handle 404
 app.use((req, res, next) => {
-    return next(new ApiError(404, "Resource not found"));
+    return next(new ApiError(404, "Không tồn tại"));
 });
 
 //error handling
 app.use((err, req, res, next) => {
   res.status(500).json({
-    message: "Internal server error",
+    message: err.message || "Có lỗi xảy ra",
   });
 });
 

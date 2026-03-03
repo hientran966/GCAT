@@ -17,7 +17,7 @@ const customMethods = {
     login: async (req, res, next) => {
         try {
             const authService = new AuthService(MySQL.connection);
-            const account = await authService.login(req.body.email, req.body.Password);
+            const account = await authService.login(req.body.phone, req.body.password);
             res.send(account);
         } catch (error) {
             console.error("Login error:", error);

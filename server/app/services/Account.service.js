@@ -141,6 +141,10 @@ class AccountService {
   }
 
   async login(identifier, password) {
+    if (!identifier || !password) {
+      throw new Error("Cần có số điện thoại và mật khẩu");
+    }
+
     const [rows] = await this.mysql.execute(
       "SELECT id, phone, name, role, password_hash FROM accounts WHERE (phone = ? OR name = ?) AND deleted_at IS NULL",
       [identifier, identifier]

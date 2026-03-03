@@ -29,6 +29,4 @@ async function startServer() {
     }
 }
 
-require("./app/jobs");
-
 startServer();

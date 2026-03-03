@@ -1,5 +1,5 @@
 {
-  "name": "fullstack-app",
+  "name": "app",
   "version": "1.0.0",
   "scripts": {
     "start": "concurrently \"npm run dev --prefix App\" \"npm start --prefix Server\" \"npm run ngrok\"",
