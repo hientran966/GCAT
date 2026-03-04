@@ -1,11 +1,12 @@
 const express = require("express");
 const auth = require("../controllers/Account.controller");
+const upload = require("../middlewares/upload.middleware");
 
 const router = express.Router();
 
 router.route("/")
     .get(auth.findAll)
-    .post(auth.create)
+    .post(upload.none(), auth.create)
 
 router.route("/deactive/:id")
     .put(auth.restore)
@@ -15,7 +16,7 @@ router.route("/login")
 
 router.route("/:id")
     .get(auth.findOne)
-    .put(auth.update)
+    .put(upload.none(), auth.update)
     .delete(auth.delete);
 
 router.route("/:id/password")

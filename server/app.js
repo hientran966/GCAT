@@ -8,6 +8,7 @@ const accountRouter = require("./app/routes/Account.route");
 const productRouter = require("./app/routes/Product.route");
 const stageRouter = require("./app/routes/Stage.route");
 const assignRouter = require("./app/routes/Assign.route");
+const reportRouter = require("./app/routes/Report.route");
 
 const app = express();
 
@@ -25,6 +26,7 @@ app.use("/api/accounts", accountRouter);
 app.use("/api/products", productRouter);
 app.use("/api/stages", stageRouter);
 app.use("/api/assigns", assignRouter);
+app.use("/api/reports", reportRouter);
 
 //handle 404
 app.use((req, res, next) => {

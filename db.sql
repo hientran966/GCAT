@@ -59,25 +59,13 @@ DROP TABLE IF EXISTS daily_reports;
 CREATE TABLE daily_reports (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     stages_id BIGINT NOT NULL,
-    report_date DATE NOT NULL,              -- ngày báo cáo
+    account_id BIGINT NOT NULL,              -- người báo cáo
     quantity_done INT NOT NULL,             -- số lượng đã làm trong ngày
     note TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     deleted_at TIMESTAMP NULL,
-    FOREIGN KEY (stages_id) REFERENCES product_stages(id)
-);
-
--- ACTIVITY LOGS (Lịch sử hệ thống)
-DROP TABLE IF EXISTS activity_logs;
-CREATE TABLE activity_logs (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    entity_type ENUM('product','stage','assignment','report','worker') NOT NULL,
-    entity_id BIGINT NOT NULL,
-    action VARCHAR(255) NOT NULL,
-    actor VARCHAR(255),
-    detail TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    deleted_at TIMESTAMP NULL
+    FOREIGN KEY (stages_id) REFERENCES product_stages(id),
+    FOREIGN KEY (account_id) REFERENCES accounts(id)
 );
 
 SET FOREIGN_KEY_CHECKS = 1;
