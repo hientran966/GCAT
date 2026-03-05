@@ -1,19 +1,19 @@
 .common-layout {
   min-height: 100vh;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
 }
 
-.sidebar {
-  width: 80px;
+.navigation {
+  height: 46px;
   background: #1f2937;
 }
 
 .main-content {
   background-image: url("../background.jpg");
   background-size: cover;
-  height: 100vh;
-  width: calc(100vw - 80px);
+  width: 100vw;
+  height: calc(100vh - 80px);
 }
 
 html,

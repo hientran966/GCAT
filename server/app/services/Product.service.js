@@ -84,7 +84,7 @@ class ProductService {
   }
 
   async find(filter = {}) {
-    let sql = `SELECT name, code, total_quantity, image_url FROM products WHERE deleted_at IS NULL`;
+    let sql = `SELECT id, name, code, total_quantity, image_url FROM products WHERE deleted_at IS NULL`;
     const params = [];
 
     if (filter.code) {
@@ -103,7 +103,7 @@ class ProductService {
 
   async findById(id) {
     const [rows] = await this.mysql.execute(
-      `SELECT name, code, total_quantity, image_url FROM products WHERE id = ? AND deleted_at IS NULL`,
+      `SELECT id, name, code, total_quantity, image_url FROM products WHERE id = ? AND deleted_at IS NULL`,
       [id]
     );
     const product = rows[0] || null;

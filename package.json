@@ -2,7 +2,7 @@
   "name": "app",
   "version": "1.0.0",
   "scripts": {
-    "start": "concurrently \"npm run dev --prefix App\" \"npm start --prefix Server\" \"npm run ngrok\"",
+    "start": "concurrently \"npm run dev --prefix web\" \"npm start --prefix server\" \"npm run ngrok\"",
     "ngrok": "wait-on http://localhost:3000 && ngrok http 3000"
   },
   "devDependencies": {

@@ -1,7 +1,7 @@
 import { createBrowserRouter, redirect } from "react-router-dom";
 import App from "../App";
 
-import Home from "../pages/Home";
+import Product from "../pages/Product";
 //import NotFound from "../pages/NotFound";
 
 /* =========================
@@ -28,11 +28,16 @@ export const router = createBrowserRouter([
     element: <App />,
     loader: authGuard,
     children: [
-      { index: true, element: <Home /> },
+      { index: true, element: <Product /> },
+
+      {
+        path: "products",
+        element: <Product />,
+      }, 
 
       {
         path: "*",
-        element: <Home />,
+        element: <Product />,
         handle: { layout: "empty" },
       },
     ],

@@ -55,7 +55,7 @@ class AccountService {
   }
 
   async find(filter = {}) {
-    let sql = `SELECT name, phone, role, address FROM accounts WHERE deleted_at IS NULL`;
+    let sql = `SELECT id, name, phone, role, address FROM accounts WHERE deleted_at IS NULL`;
     const params = [];
 
     if (filter.phone) {
@@ -74,7 +74,7 @@ class AccountService {
 
   async findById(id) {
     const [rows] = await this.mysql.execute(
-      `SELECT name, phone, role, address FROM accounts WHERE id = ? AND deleted_at IS NULL`,
+      `SELECT id, name, phone, role, address FROM accounts WHERE id = ? AND deleted_at IS NULL`,
       [id]
     );
     const account = rows[0] || null;

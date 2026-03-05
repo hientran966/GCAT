@@ -52,7 +52,7 @@ class ReportService {
   }
 
   async find(filter = {}) {
-    let sql = `SELECT account_id, stages_id, quantity_done, note FROM daily_reports WHERE deleted_at IS NULL`;
+    let sql = `SELECT id, account_id, stages_id, quantity_done, note FROM daily_reports WHERE deleted_at IS NULL`;
     const params = [];
 
     if (filter.stages_id) {
@@ -71,7 +71,7 @@ class ReportService {
 
   async findById(id) {
     const [rows] = await this.mysql.execute(
-      `SELECT account_id, stages_id, quantity_done, note FROM daily_reports WHERE id = ? AND deleted_at IS NULL`,
+      `SELECT id, account_id, stages_id, quantity_done, note FROM daily_reports WHERE id = ? AND deleted_at IS NULL`,
       [id]
     );
     const report = rows[0] || null;

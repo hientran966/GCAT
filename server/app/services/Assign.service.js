@@ -56,7 +56,7 @@ class AssignService {
   }
 
   async find(filter = {}) {
-    let sql = `SELECT stage_id, account_id, assigned_quantity FROM stage_assignments WHERE deleted_at IS NULL`;
+    let sql = `SELECT id, stage_id, account_id, assigned_quantity FROM stage_assignments WHERE deleted_at IS NULL`;
     const params = [];
 
     if (filter.account_id) {
@@ -75,7 +75,7 @@ class AssignService {
 
   async findById(id) {
     const [rows] = await this.mysql.execute(
-      `SELECT stage_id, account_id, assigned_quantity FROM stage_assignments WHERE id = ? AND deleted_at IS NULL`,
+      `SELECT id, stage_id, account_id, assigned_quantity FROM stage_assignments WHERE id = ? AND deleted_at IS NULL`,
       [id]
     );
     const assign = rows[0] || null;
