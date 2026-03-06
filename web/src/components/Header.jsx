@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { useDispatch } from "react-redux";
 import {
+  Breadcrumb,
   Button,
   Input,
 } from "antd";
@@ -9,44 +10,66 @@ import {
   SearchOutlined,
 } from "@ant-design/icons";
 
-import {
-  setSearch as setProductSearch,
-} from "@/stores/productSlice";
+import { setSearch as setProductSearch } from "@/stores/productSlice";
 
 import "@/assets/css/Header.css";
 
 export default function Header({
   page,
   view,
+  product,
+  account,
   onAdd,
 }) {
   const dispatch = useDispatch();
 
   /* =====================
-     STATE
+     BREADCRUMB
   ===================== */
+  const breadcrumbItems = useMemo(() => {
+    if (page === "product") {
+      const items = [
+        { title: "Danh sách hàng" },
+      ];
 
-  /* =====================
-     TITLE
-  ===================== */
-  const pageTitle = useMemo(() => {
-    if (view === "1") return 1;
-    if (page === "2") return 2;
-    return page === "project" ? "Danh sách Project" : "Danh sách";
-  }, [page, view]);
+      return items;
+    }
 
-  /* =====================
-     RENDER
-  ===================== */
+    if (page === "stage" && product?.name) {
+      const items = [
+        { title: product.name }
+      ];
+      items.push({ title: "Danh sách công đoạn" });
+
+      return items;
+    }
+
+    if (page === "worker") {
+      const items = [
+        { title: "Nhân công" },
+      ];
+
+      if (view === "detail" && account?.name) {
+        items.push({ title: account.name });
+      }
+
+      return items;
+    }
+
+    return [{ title: "Danh sách" }];
+  }, [page, view, product, account]);
+
   return (
     <div style={{ padding: "16px 24px", background: "#fff" }}>
-      {/* ===== TITLE ===== */}
-      <div style={{ display: "flex", alignItems: "center", height: 40 }}>
-        <h3 style={{ margin: 0, marginLeft: 16, color: "black" }}>{pageTitle}</h3>
+      
+      {/* ===== BREADCRUMB ===== */}
+      <div style={{ marginBottom: 12 }}>
+        <Breadcrumb items={breadcrumbItems} style={{ fontSize: 18, fontWeight: 500 }} />
       </div>
 
       {/* ===== TOOLBAR ===== */}
       <div style={{ display: "flex", justifyContent: "space-between" }}>
+        
         {/* LEFT */}
         <div style={{ display: "flex", alignItems: "center" }}>
           <Button type="primary" icon={<PlusOutlined />} onClick={onAdd}>
@@ -60,13 +83,13 @@ export default function Header({
             placeholder="Tìm kiếm..."
             prefix={<SearchOutlined />}
             onChange={(e) => {
-              const value = e.target.value;
-              dispatch(setProductSearch(value));
+              dispatch(setProductSearch(e.target.value));
             }}
             style={{ width: 180, marginRight: 8 }}
             allowClear
           />
         </div>
+
       </div>
     </div>
   );

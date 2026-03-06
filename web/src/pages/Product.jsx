@@ -6,7 +6,6 @@ import ProductTable from "@/components/ProductTable";
 import ProductForm from "@/components/ProductForm";
 
 import { fetchProducts, updateProduct } from "@/stores/productSlice";
-
 import { selectFilteredProducts } from "@/stores/productSelectors";
 
 import "@/assets/css/Products.css";

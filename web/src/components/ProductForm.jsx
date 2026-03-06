@@ -19,12 +19,12 @@ const ProductForm = ({ open, onClose, onProductAdded }) => {
 
       await ProductService.createProduct(payload);
 
-      message.success("Tạo dự án thành công");
+      message.success("Thêm thành công");
       form.resetFields();
       onClose();
       onProductAdded?.();
     } catch {
-      message.error("Lỗi tạo dự án");
+      message.error("Lỗi thêm mới");
     }
   };
 
@@ -43,7 +43,7 @@ const ProductForm = ({ open, onClose, onProductAdded }) => {
           layout="horizontal"
           labelCol={{ span: 6 }}
           wrapperCol={{ span: 18 }}
-          initialValues={{ status: "Lên kế hoạch" }}
+          initialValues={{}}
         >
           <Form.Item
             label="Mã hàng"

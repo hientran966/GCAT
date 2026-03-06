@@ -86,16 +86,29 @@ class StageService {
   }
 
   async find(filter = {}) {
-    let sql = `SELECT stage_name, product_id, price, stage_quantity, image_url FROM product_stages WHERE deleted_at IS NULL`;
+    let sql = `
+      SELECT 
+        ps.id,
+        ps.stage_name,
+        ps.product_id,
+        p.code AS product_code,
+        ps.price,
+        ps.stage_quantity,
+        ps.image_url
+      FROM product_stages ps
+      JOIN products p ON ps.product_id = p.id
+      WHERE ps.deleted_at IS NULL
+    `;
+
     const params = [];
 
     if (filter.product_id) {
-      sql += " AND product_id LIKE ?";
-      params.push(`%${filter.product_id}%`);
+      sql += " AND ps.product_id = ?";
+      params.push(filter.product_id);
     }
 
     if (filter.stage_name) {
-      sql += " AND stage_name LIKE ?";
+      sql += " AND ps.stage_name LIKE ?";
       params.push(`%${filter.stage_name}%`);
     }
 
@@ -105,11 +118,24 @@ class StageService {
 
   async findById(id) {
     const [rows] = await this.mysql.execute(
-      `SELECT stage_name, product_id, price, stage_quantity, image_url FROM product_stages WHERE id = ? AND deleted_at IS NULL`,
+      `
+      SELECT 
+        ps.id,
+        ps.stage_name,
+        ps.product_id,
+        p.code AS product_code,
+        ps.price,
+        ps.stage_quantity,
+        ps.image_url
+      FROM product_stages ps
+      JOIN products p ON ps.product_id = p.id
+      WHERE ps.id = ? AND ps.deleted_at IS NULL
+      `,
       [id]
     );
+
     const stage = rows[0] || null;
-    if (!stage) throw new Error("Sản phẩm không tồn tại");
+    if (!stage) throw new Error("Công đoạn không tồn tại");
 
     return stage;
   }

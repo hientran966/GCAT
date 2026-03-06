@@ -1,41 +1,44 @@
 import { useMemo, useState } from "react";
 import { Button, Table } from "antd";
-import { useNavigate } from "react-router-dom";
 
 const PAGE_SIZE = 6;
 
-function ProductTable({ products }) {
+function StageTable({ stages }) {
   const [currentPage, setCurrentPage] = useState(1);
-  const navigate = useNavigate();
 
   /* ================= DATA SOURCE ================= */
   const dataSource = useMemo(
     () =>
-      products.map((p) => ({
+      stages.map((p) => ({
         key: p.id,
         ...p,
       })),
-    [products]
+    [stages]
   );
 
   /* ================= COLUMNS ================= */
   const columns = [
     {
       title: "Mã hàng",
-      dataIndex: "code",
-      key: "code",
+      dataIndex: "product_code",
+      key: "product_code",
       ellipsis: true,
     },
     {
-      title: "Tên hàng",
-      dataIndex: "name",
-      key: "name",
+      title: "Tên công đoạn",
+      dataIndex: "stage_name",
+      key: "stage_name",
       ellipsis: true,
     },
     {
       title: "Số lượng",
-      dataIndex: "total_quantity",
-      key: "total_quantity",
+      dataIndex: "stage_quantity",
+      key: "stage_quantity",
+    },
+    {
+      title: "Giá",
+      dataIndex: "price",
+      key: "price",
     },
     {
       title: "Hành động",
@@ -57,7 +60,6 @@ function ProductTable({ products }) {
   const onEdit = (record) => {
     console.log("Edit", record);
   };
-
   const onDelete = (record) => {
     console.log("Delete", record);
   };
@@ -75,15 +77,11 @@ function ProductTable({ products }) {
         showSizeChanger: false,
       }}
       onRow={(record) => ({
-        onClick: () => {
-          navigate("/stages", {
-            state: { product: record },
-          });
-        },
+        onClick: () => {console.log(record)},
       })}
-      rowClassName="product-row"
+      rowClassstage_name="product-row"
     />
   );
 }
 
-export default ProductTable;
+export default StageTable;

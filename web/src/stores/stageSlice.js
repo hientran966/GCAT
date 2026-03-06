@@ -1,30 +1,30 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import ProductService from "@/services/Product.service";
+import StageService from "@/services/Stage.service";
 
 /* =====================
    ASYNC THUNKS
 ===================== */
 
-// fetchProducts
-export const fetchProducts = createAsyncThunk(
-  "product/fetchProducts",
-  async (_, { rejectWithValue }) => {
+// fetchStages
+export const fetchStages = createAsyncThunk(
+  "stage/fetchStages",
+  async (productId, { rejectWithValue }) => {
     try {
-      const products = await ProductService.getAllProduct({});
-      return products;
+      const stages = await StageService.getAllStage({ product_id: productId });
+      return stages;
     } catch (err) {
       return rejectWithValue(err.response?.data || err.message);
     }
   }
 );
 
-// updateProduct
-export const updateProduct = createAsyncThunk(
-  "product/updateProduct",
+// updateStage
+export const updateStage = createAsyncThunk(
+  "stage/updateStage",
   async (payload, { dispatch, rejectWithValue }) => {
     try {
-      await ProductService.updateProduct(payload.id, payload);
-      dispatch(fetchProducts());
+      await StageService.updateStage(payload.id, payload);
+      dispatch(fetchStages());
       return payload;
     } catch (err) {
       return rejectWithValue(err.response?.data || err.message);
@@ -36,18 +36,18 @@ export const updateProduct = createAsyncThunk(
    SLICE
 ===================== */
 
-const ProductSlice = createSlice({
-  name: "product",
+const StageSlice = createSlice({
+  name: "stage",
   initialState: {
-    products: [],
+    stages: [],
     loading: false,
     searchTerm: "",
     error: null,
   },
 
   reducers: {
-    addProduct(state, action) {
-      state.products.push(action.payload);
+    addStage(state, action) {
+      state.stages.push(action.payload);
     },
 
     setSearch(state, action) {
@@ -57,15 +57,15 @@ const ProductSlice = createSlice({
 
   extraReducers: (builder) => {
     builder
-      /* fetchProducts */
-      .addCase(fetchProducts.pending, (state) => {
+      /* fetchStages */
+      .addCase(fetchStages.pending, (state) => {
         state.loading = true;
       })
-      .addCase(fetchProducts.fulfilled, (state, action) => {
+      .addCase(fetchStages.fulfilled, (state, action) => {
         state.loading = false;
-        state.products = action.payload.map(p => ({ ...p }));
+        state.stages = action.payload.map(p => ({ ...p }));
       })
-      .addCase(fetchProducts.rejected, (state, action) => {
+      .addCase(fetchStages.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });
@@ -77,8 +77,8 @@ const ProductSlice = createSlice({
 ===================== */
 
 export const {
-  addProduct,
+  addStage,
   setSearch,
-} = ProductSlice.actions;
+} = StageSlice.actions;
 
-export default ProductSlice.reducer;
+export default StageSlice.reducer;

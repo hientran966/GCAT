@@ -2,6 +2,7 @@ import { createBrowserRouter, redirect } from "react-router-dom";
 import App from "../App";
 
 import Product from "../pages/Product";
+import Stage from "../pages/Stage";
 //import NotFound from "../pages/NotFound";
 
 /* =========================
@@ -33,6 +34,11 @@ export const router = createBrowserRouter([
       {
         path: "products",
         element: <Product />,
+      }, 
+
+      {
+        path: "stages",
+        element: <Stage />,
       }, 
 
       {
