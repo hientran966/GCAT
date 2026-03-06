@@ -23,6 +23,33 @@ function StageTable({ stages, onEdit, onDelete }) {
       dataIndex: "product_code",
       key: "product_code",
       ellipsis: true,
+      width: 120,
+      align: "center",
+    },
+    {
+      title: "Hình ảnh",
+      dataIndex: "image_url",
+      key: "image_url",
+      width: 120,
+      align: "center",
+      render: (url) => {
+        if (!url) return "-";
+
+        const imagePath = `http://localhost:3000/${url.replace(/\\/g, "/")}`;
+
+        return (
+          <img
+            src={imagePath}
+            alt="stage"
+            style={{
+              width: 32,
+              height: 32,
+              objectFit: "cover",
+              borderRadius: 6,
+            }}
+          />
+        );
+      },
     },
     {
       title: "Tên công đoạn",
@@ -34,15 +61,18 @@ function StageTable({ stages, onEdit, onDelete }) {
       title: "Số lượng",
       dataIndex: "stage_quantity",
       key: "stage_quantity",
+      align: "center",
     },
     {
       title: "Giá",
       dataIndex: "price",
       key: "price",
+      align: "center",
     },
     {
       title: "Hành động",
       key: "actions",
+      align: "center",
       render: (_, record) => (
         <div onClick={(e) => e.stopPropagation()}>
           <Button type="link" onClick={() => onEdit(record)}>

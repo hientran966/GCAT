@@ -25,6 +25,33 @@ function ProductTable({ products, onEdit, onDelete }) {
       dataIndex: "code",
       key: "code",
       ellipsis: true,
+      width: 120,
+      align: "center",
+    },
+    {
+      title: "Hình ảnh",
+      dataIndex: "image_url",
+      key: "image_url",
+      width: 120,
+      align: "center",
+      render: (url) => {
+        if (!url) return "-";
+
+        const imagePath = `http://localhost:3000/${url.replace(/\\/g, "/")}`;
+
+        return (
+          <img
+            src={imagePath}
+            alt="product"
+            style={{
+              width: 32,
+              height: 32,
+              objectFit: "cover",
+              borderRadius: 6,
+            }}
+          />
+        );
+      },
     },
     {
       title: "Tên hàng",
@@ -36,10 +63,12 @@ function ProductTable({ products, onEdit, onDelete }) {
       title: "Số lượng",
       dataIndex: "total_quantity",
       key: "total_quantity",
+      align: "center",
     },
     {
       title: "Hành động",
       key: "actions",
+      align: "center",
       render: (_, record) => (
         <div onClick={(e) => e.stopPropagation()}>
           <Button type="link" onClick={() => onEdit(record)}>
