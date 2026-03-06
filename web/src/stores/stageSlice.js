@@ -24,7 +24,7 @@ export const updateStage = createAsyncThunk(
   async (payload, { dispatch, rejectWithValue }) => {
     try {
       await StageService.updateStage(payload.id, payload);
-      dispatch(fetchStages());
+      dispatch(fetchStages(payload.product_id));
       return payload;
     } catch (err) {
       return rejectWithValue(err.response?.data || err.message);

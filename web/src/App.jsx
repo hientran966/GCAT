@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-unused-vars */
 import { useEffect, useState } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
@@ -26,10 +27,6 @@ function App() {
     if (!user?.id) return;
 
     socket = initSocket(user.id);
-
-    socket.on("product_updated", () => {
-      dispatch(fetchProducts());
-    });
 
     return () => {
       disconnectSocket();

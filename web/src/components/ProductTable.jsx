@@ -1,10 +1,10 @@
 import { useMemo, useState } from "react";
-import { Button, Table } from "antd";
+import { Button, Table, Popconfirm } from "antd";
 import { useNavigate } from "react-router-dom";
 
 const PAGE_SIZE = 6;
 
-function ProductTable({ products }) {
+function ProductTable({ products, onEdit, onDelete }) {
   const [currentPage, setCurrentPage] = useState(1);
   const navigate = useNavigate();
 
@@ -41,26 +41,26 @@ function ProductTable({ products }) {
       title: "Hành động",
       key: "actions",
       render: (_, record) => (
-        <div>
+        <div onClick={(e) => e.stopPropagation()}>
           <Button type="link" onClick={() => onEdit(record)}>
             Sửa
           </Button>
-          <Button type="link" danger onClick={() => onDelete(record)}>
-            Xóa
-          </Button>
+
+          <Popconfirm
+            title="Xóa sản phẩm?"
+            description="Bạn chắc chắn muốn xóa?"
+            onConfirm={() => onDelete(record)}
+            okText="Xóa"
+            cancelText="Hủy"
+          >
+            <Button type="link" danger>
+              Xóa
+            </Button>
+          </Popconfirm>
         </div>
       ),
-    }
+    },
   ];
-
-  /* ================= HANDLERS ================= */
-  const onEdit = (record) => {
-    console.log("Edit", record);
-  };
-
-  const onDelete = (record) => {
-    console.log("Delete", record);
-  };
 
   /* ================= RENDER ================= */
   return (

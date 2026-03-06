@@ -1,11 +1,14 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { message } from "antd";
 
 import Header from "@/components/Header";
 import ProductTable from "@/components/ProductTable";
 import ProductForm from "@/components/ProductForm";
 
-import { fetchProducts, updateProduct } from "@/stores/productSlice";
+import ProductService from "@/services/Product.service";
+
+import { fetchProducts } from "@/stores/productSlice";
 import { selectFilteredProducts } from "@/stores/productSelectors";
 
 import "@/assets/css/Products.css";
@@ -23,14 +26,25 @@ function ProductsView() {
      UI STATE
   ======================= */
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [editingProduct, setEditingProduct] = useState(null);
 
   /* =======================
      HANDLERS
   ======================= */
-  const onAdd = () => setIsFormOpen(true);
+  const onAdd = () => {
+    setEditingProduct(null);
+    setIsFormOpen(true);
+  };
 
-  const onUpdateProduct = (payload) => {
-    dispatch(updateProduct(payload));
+  const onEdit = (product) => {
+    setEditingProduct(product);
+    setIsFormOpen(true);
+  };
+
+  const onDelete = async (product) => {
+    await ProductService.deleteProduct(product.id);
+    message.success("Xóa thành công");
+    dispatch(fetchProducts());
   };
 
   const onProductAdded = () => {
@@ -56,11 +70,13 @@ function ProductsView() {
         className="product-table"
         loading={loading}
         products={products}
-        onUpdateProduct={onUpdateProduct}
+        onEdit={onEdit}
+        onDelete={onDelete}
       />
 
       <ProductForm
         open={isFormOpen}
+        product={editingProduct}
         onClose={() => setIsFormOpen(false)}
         onProductAdded={onProductAdded}
       />

@@ -1,50 +1,64 @@
-import { useState } from "react";
+/* eslint-disable react-hooks/exhaustive-deps */
+import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
-import {
-  Modal,
-  Form,
-  Input,
-  message,
-  Select,
-} from "antd";
+import { Modal, Form, Input, message, Select } from "antd";
 
 import StageService from "@/services/Stage.service";
 import { selectFilteredProducts } from "@/stores/productSelectors";
 
-const StageForm = ({ open, onClose, onStageAdded }) => {
-  /* ================= STORE ================= */
+const StageForm = ({ open, onClose, onStageAdded, stage }) => {
   const products = useSelector(selectFilteredProducts);
 
   /* ================= FORM ================= */
   const [form] = Form.useForm();
   const [selectedProduct, setSelectedProduct] = useState(null);
 
-  /* ================= SUBMIT ================= */
+  useEffect(() => {
+    if (stage) {
+      form.setFieldsValue({
+        ...stage,
+        product_code: stage.product_code,
+      });
+
+      const product = products.find((p) => p.code === stage.product_code);
+      setSelectedProduct(product);
+    } else {
+      form.resetFields();
+      setSelectedProduct(null);
+    }
+  }, [stage]);
+
   const submit = async () => {
     try {
       const values = await form.validateFields();
+      const product = products.find((p) => p.code === values.product_code);
 
       const payload = {
         ...values,
-        product_id: values.product_id,
+        product_id: product?.id,
       };
 
-      await StageService.createStage(payload);
+      if (stage) {
+        await StageService.updateStage(stage.id, payload);
+        message.success("Cập nhật thành công");
+      } else {
+        await StageService.createStage(payload);
+        message.success("Thêm thành công");
+      }
 
-      message.success("Thêm thành công");
       form.resetFields();
       setSelectedProduct(null);
       onClose();
       onStageAdded?.();
     } catch {
-      message.error("Lỗi thêm mới");
+      message.error("Có lỗi xảy ra");
     }
   };
 
   return (
     <Modal
       open={open}
-      title="Thêm Công Đoạn Mới"
+      title={stage ? "Chỉnh sửa công đoạn" : "Thêm công đoạn"}
       width={600}
       onCancel={onClose}
       onOk={submit}
@@ -59,24 +73,24 @@ const StageForm = ({ open, onClose, onStageAdded }) => {
         {/* PRODUCT CODE */}
         <Form.Item
           label="Mã hàng"
-          name="product_id"
+          name="product_code"
           rules={[{ required: true, message: "Bắt buộc" }]}
         >
-          <Select
-            showSearch
-            placeholder="Nhập để tìm mã hàng"
-            optionFilterProp="children"
-            onChange={(value) => {
-              const product = products.find((p) => p.id === value);
-              setSelectedProduct(product);
-            }}
-          >
-            {products.map((p) => (
-              <Select.Option key={p.id} value={p.id}>
-                {p.code}
-              </Select.Option>
-            ))}
-          </Select>
+        <Select
+          showSearch
+          placeholder="Nhập để tìm mã hàng"
+          optionFilterProp="children"
+          onChange={(value) => {
+            const product = products.find((p) => p.code === value);
+            setSelectedProduct(product);
+          }}
+        >
+          {products.map((p) => (
+            <Select.Option key={p.id} value={p.code}>
+              {p.code}
+            </Select.Option>
+          ))}
+        </Select>
         </Form.Item>
 
         {/* STAGE NAME */}

@@ -9,6 +9,7 @@ export const selectFilteredProducts = (state) => {
   const lower = searchTerm.toLowerCase();
 
   return products.filter((p) =>
+    p.code?.toLowerCase().includes(lower) ||
     p.name?.toLowerCase().includes(lower)
   );
 };

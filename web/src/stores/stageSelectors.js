@@ -1,14 +1,22 @@
 export const selectStageById = (state, id) =>
   state.stage.stages.find(p => p.id === id);
 
-export const selectFilteredStages = (state) => {
+export const selectFilteredStages = (state, productId) => {
   const { stages, searchTerm } = state.stage;
 
-  if (!searchTerm) return stages;
+  let filtered = stages;
 
-  const lower = searchTerm.toLowerCase();
+  if (productId) {
+    filtered = filtered.filter((s) => s.product_id === productId);
+  }
 
-  return stages.filter((p) =>
-    p.name?.toLowerCase().includes(lower)
-  );
+  if (searchTerm) {
+    const lower = searchTerm.toLowerCase();
+
+    filtered = filtered.filter((s) =>
+      s.name?.toLowerCase().includes(lower)
+    );
+  }
+
+  return filtered;
 };

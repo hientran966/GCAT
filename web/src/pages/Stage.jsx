@@ -1,12 +1,15 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
+import { message } from "antd";
 
 import Header from "@/components/Header";
 import StageTable from "@/components/StageTable";
 import StageForm from "@/components/StageForm";
 
-import { fetchStages, updateStage } from "@/stores/stageSlice";
+import StageService from "@/services/Stage.service";
+
+import { fetchStages } from "@/stores/stageSlice";
 import { selectFilteredStages } from "@/stores/stageSelectors";
 
 import "@/assets/css/Stage.css";
@@ -19,21 +22,32 @@ function StagesView() {
   /* =======================
      STORE
   ======================= */
-  const stages = useSelector(selectFilteredStages);
+  const stages = useSelector((state) => selectFilteredStages(state, product.id));
   const loading = useSelector((state) => state.stage.loading);
 
   /* =======================
      UI STATE
   ======================= */
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [editingStage, setEditingStage] = useState(null);
 
   /* =======================
      HANDLERS
   ======================= */
-  const onAdd = () => setIsFormOpen(true);
+  const onAdd = () => {
+    setEditingStage(null);
+    setIsFormOpen(true);
+  };
 
-  const onUpdateStage = (payload) => {
-    dispatch(updateStage(payload));
+  const onEdit = (stage) => {
+    setEditingStage(stage);
+    setIsFormOpen(true);
+  };
+
+  const onDelete = async (stage) => {
+    await StageService.deleteStage(stage.id);
+    message.success("Xóa thành công");
+    dispatch(fetchStages(product.id));
   };
 
   const onStageAdded = () => {
@@ -59,11 +73,13 @@ function StagesView() {
         className="stage-table"
         loading={loading}
         stages={stages}
-        onUpdateStage={onUpdateStage}
+        onEdit={onEdit}
+        onDelete={onDelete}
       />
 
       <StageForm
         open={isFormOpen}
+        stage={editingStage}
         onClose={() => setIsFormOpen(false)}
         onStageAdded={onStageAdded}
       />

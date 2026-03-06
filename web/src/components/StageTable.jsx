@@ -1,9 +1,9 @@
 import { useMemo, useState } from "react";
-import { Button, Table } from "antd";
+import { Button, Table, Popconfirm } from "antd";
 
 const PAGE_SIZE = 6;
 
-function StageTable({ stages }) {
+function StageTable({ stages, onEdit, onDelete }) {
   const [currentPage, setCurrentPage] = useState(1);
 
   /* ================= DATA SOURCE ================= */
@@ -44,25 +44,26 @@ function StageTable({ stages }) {
       title: "Hành động",
       key: "actions",
       render: (_, record) => (
-        <div>
+        <div onClick={(e) => e.stopPropagation()}>
           <Button type="link" onClick={() => onEdit(record)}>
             Sửa
           </Button>
-          <Button type="link" danger onClick={() => onDelete(record)}>
-            Xóa
-          </Button>
+
+          <Popconfirm
+            title="Xóa công đoạn?"
+            description="Bạn chắc chắn muốn xóa?"
+            onConfirm={() => onDelete(record)}
+            okText="Xóa"
+            cancelText="Hủy"
+          >
+            <Button type="link" danger>
+              Xóa
+            </Button>
+          </Popconfirm>
         </div>
       ),
     }
   ];
-
-  /* ================= HANDLERS ================= */
-  const onEdit = (record) => {
-    console.log("Edit", record);
-  };
-  const onDelete = (record) => {
-    console.log("Delete", record);
-  };
 
   /* ================= RENDER ================= */
   return (
@@ -79,7 +80,7 @@ function StageTable({ stages }) {
       onRow={(record) => ({
         onClick: () => {console.log(record)},
       })}
-      rowClassstage_name="product-row"
+      rowClassName="stage-row"
     />
   );
 }
