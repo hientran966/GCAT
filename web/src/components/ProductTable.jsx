@@ -6,7 +6,6 @@ const PAGE_SIZE = 7;
 function ProductTable({ products }) {
   const [currentPage, setCurrentPage] = useState(1);
 
-  /* ================= DATA SOURCE ================= */
   const dataSource = useMemo(
     () =>
       products.map((p) => ({
