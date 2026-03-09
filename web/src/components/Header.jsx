@@ -17,7 +17,6 @@ import "@/assets/css/Header.css";
 export default function Header({
   page,
   view,
-  product,
   account,
   onAdd,
 }) {
@@ -35,11 +34,18 @@ export default function Header({
       return items;
     }
 
-    if (page === "stage" && product?.name) {
+    if (page === "stage" ) {
       const items = [
-        { title: product.name }
+        { title: "Danh sách công đoạn"  }
       ];
-      items.push({ title: "Danh sách công đoạn" });
+
+      return items;
+    }
+
+    if (page === "assign" ) {
+      const items = [
+        { title: "Danh sách phân công"  }
+      ];
 
       return items;
     }
@@ -57,7 +63,7 @@ export default function Header({
     }
 
     return [{ title: "Danh sách" }];
-  }, [page, view, product, account]);
+  }, [page, view, account]);
 
   return (
     <div style={{ padding: "16px 24px", background: "#fff" }}>

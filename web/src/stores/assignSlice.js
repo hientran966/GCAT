@@ -1,30 +1,30 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import StageService from "@/services/Stage.service";
+import AssignService from "@/services/Assign.service";
 
 /* =====================
    ASYNC THUNKS
 ===================== */
 
-// fetchStages
-export const fetchStages = createAsyncThunk(
-  "stage/fetchStages",
+// fetchAssigns
+export const fetchAssigns = createAsyncThunk(
+  "stage/fetchAssigns",
   async (__, { rejectWithValue }) => {
     try {
-      const stages = await StageService.getAllStage();
-      return stages;
+      const assigns = await AssignService.getAllAssign();
+      return assigns;
     } catch (err) {
       return rejectWithValue(err.response?.data || err.message);
     }
   }
 );
 
-// updateStage
-export const updateStage = createAsyncThunk(
-  "stage/updateStage",
+// updateAssign
+export const updateAssign = createAsyncThunk(
+  "stage/updateAssign",
   async (payload, { dispatch, rejectWithValue }) => {
     try {
-      await StageService.updateStage(payload.id, payload);
-      dispatch(fetchStages(payload.product_id));
+      await AssignService.updateAssign(payload.id, payload);
+      dispatch(fetchAssigns());
       return payload;
     } catch (err) {
       return rejectWithValue(err.response?.data || err.message);
@@ -36,18 +36,18 @@ export const updateStage = createAsyncThunk(
    SLICE
 ===================== */
 
-const StageSlice = createSlice({
-  name: "stage",
+const assignSlice = createSlice({
+  name: "assign",
   initialState: {
-    stages: [],
+    assigns: [],
     loading: false,
     searchTerm: "",
     error: null,
   },
 
   reducers: {
-    addStage(state, action) {
-      state.stages.push(action.payload);
+    addAssign(state, action) {
+      state.assigns.push(action.payload);
     },
 
     setSearch(state, action) {
@@ -57,15 +57,15 @@ const StageSlice = createSlice({
 
   extraReducers: (builder) => {
     builder
-      /* fetchStages */
-      .addCase(fetchStages.pending, (state) => {
+      /* fetchAssigns */
+      .addCase(fetchAssigns.pending, (state) => {
         state.loading = true;
       })
-      .addCase(fetchStages.fulfilled, (state, action) => {
+      .addCase(fetchAssigns.fulfilled, (state, action) => {
         state.loading = false;
-        state.stages = action.payload.map(p => ({ ...p }));
+        state.assigns = action.payload.map(p => ({ ...p }));
       })
-      .addCase(fetchStages.rejected, (state, action) => {
+      .addCase(fetchAssigns.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });
@@ -77,8 +77,8 @@ const StageSlice = createSlice({
 ===================== */
 
 export const {
-  addStage,
+  addAssign,
   setSearch,
-} = StageSlice.actions;
+} = assignSlice.actions;
 
-export default StageSlice.reducer;
+export default assignSlice.reducer;

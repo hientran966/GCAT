@@ -137,10 +137,14 @@ const StageForm = ({ open, onClose, onStageAdded, stage }) => {
             {
               validator: (_, value) => {
                 if (!selectedProduct) return Promise.resolve();
-                if (value > selectedProduct.total_quantity) {
+                const numValue = Number(value);
+                if (isNaN(numValue) || numValue <= 0) {
+                  return Promise.reject(new Error("Số lượng phải là số dương"));
+                }
+                if (numValue + selectedProduct.assigned_quantity > selectedProduct.total_quantity) {
                   return Promise.reject(
                     new Error(
-                      `Không được vượt quá ${selectedProduct.total_quantity}`
+                      `Không được vượt quá ${selectedProduct.total_quantity - selectedProduct.assigned_quantity}`
                     )
                   );
                 }

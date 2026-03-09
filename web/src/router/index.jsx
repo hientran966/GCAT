@@ -3,6 +3,7 @@ import App from "../App";
 
 import Product from "../pages/Product";
 import Stage from "../pages/Stage";
+import Assign from "../pages/Assign";
 //import NotFound from "../pages/NotFound";
 
 /* =========================
@@ -39,6 +40,11 @@ export const router = createBrowserRouter([
       {
         path: "stages",
         element: <Stage />,
+      }, 
+
+      {
+        path: "assigns",
+        element: <Assign />,
       }, 
 
       {

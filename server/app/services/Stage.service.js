@@ -93,6 +93,7 @@ class StageService {
         ps.product_id,
         p.code AS product_code,
         ps.price,
+        ps.assigned_quantity,
         ps.stage_quantity,
         ps.image_url
       FROM product_stages ps
@@ -125,6 +126,7 @@ class StageService {
         ps.product_id,
         p.code AS product_code,
         ps.price,
+        ps.assigned_quantity,
         ps.stage_quantity,
         ps.image_url
       FROM product_stages ps

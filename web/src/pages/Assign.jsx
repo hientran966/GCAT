@@ -3,51 +3,52 @@ import { useDispatch, useSelector } from "react-redux";
 import { message } from "antd";
 
 import Header from "@/components/Header";
-import StageTable from "@/components/StageTable";
-import StageForm from "@/components/StageForm";
+import AssignTable from "@/components/AssignTable";
+import AssignForm from "@/components/AssignForm";
 
-import StageService from "@/services/Stage.service";
+import AssignService from "@/services/Assign.service";
 
-import { fetchStages } from "@/stores/stageSlice";
-import { selectFilteredStages } from "@/stores/stageSelectors";
+import { fetchAssigns } from "@/stores/assignSlice";
+import { selectFilteredAssigns } from "@/stores/assignSelectors";
 
 import "@/assets/css/Stage.css";
 
-function StagesView() {
+function AssignsView() {
   const dispatch = useDispatch();
+
   /* =======================
      STORE
   ======================= */
-  const stages = useSelector(selectFilteredStages);
-  const loading = useSelector((state) => state.stage.loading);
+  const assigns = useSelector(selectFilteredAssigns);
+  const loading = useSelector((state) => state.assign.loading);
 
   /* =======================
      UI STATE
   ======================= */
   const [isFormOpen, setIsFormOpen] = useState(false);
-  const [editingStage, setEditingStage] = useState(null);
+  const [editingAssign, setEditingAssign] = useState(null);
 
   /* =======================
      HANDLERS
   ======================= */
   const onAdd = () => {
-    setEditingStage(null);
+    setEditingAssign(null);
     setIsFormOpen(true);
   };
 
-  const onEdit = (stage) => {
-    setEditingStage(stage);
+  const onEdit = (assgin) => {
+    setEditingAssign(assgin);
     setIsFormOpen(true);
   };
 
-  const onDelete = async (stage) => {
-    await StageService.deleteStage(stage.id);
+  const onDelete = async (assgin) => {
+    await AssignService.deleteAssign(assgin.id);
     message.success("Xóa thành công");
-    dispatch(fetchStages());
+    dispatch(fetchAssigns());
   };
 
-  const onStageAdded = () => {
-    dispatch(fetchStages());
+  const onAssignAdded = () => {
+    dispatch(fetchAssigns());
     setIsFormOpen(false);
   };
 
@@ -55,7 +56,7 @@ function StagesView() {
      LIFECYCLE
   ======================= */
   useEffect(() => {
-    dispatch(fetchStages());
+    dispatch(fetchAssigns());
   }, [dispatch]);
 
   /* =======================
@@ -63,24 +64,24 @@ function StagesView() {
   ======================= */
   return (
     <>
-      <Header page="stage" onAdd={onAdd} />
+      <Header page="assign" onAdd={onAdd} />
 
-      <StageTable
-        className="stage-table"
+      <AssignTable
+        className="assign-table"
         loading={loading}
-        stages={stages}
+        assigns={assigns}
         onEdit={onEdit}
         onDelete={onDelete}
       />
 
-      <StageForm
+      <AssignForm
         open={isFormOpen}
-        stage={editingStage}
+        stage={editingAssign}
         onClose={() => setIsFormOpen(false)}
-        onStageAdded={onStageAdded}
+        onAssignAdded={onAssignAdded}
       />
     </>
   );
 }
 
-export default StagesView;
+export default AssignsView;

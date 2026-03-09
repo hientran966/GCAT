@@ -3,17 +3,17 @@ import { Button, Table, Popconfirm } from "antd";
 
 const PAGE_SIZE = 6;
 
-function StageTable({ stages, onAssign, onEdit, onDelete }) {
+function AssignTable({ assigns, onEdit, onDelete }) {
   const [currentPage, setCurrentPage] = useState(1);
 
   /* ================= DATA SOURCE ================= */
   const dataSource = useMemo(
     () =>
-      stages.map((p) => ({
+      assigns.map((p) => ({
         key: p.id,
         ...p,
       })),
-    [stages]
+    [assigns]
   );
 
   /* ================= COLUMNS ================= */
@@ -27,46 +27,21 @@ function StageTable({ stages, onAssign, onEdit, onDelete }) {
       align: "center",
     },
     {
-      title: "Hình ảnh",
-      dataIndex: "image_url",
-      key: "image_url",
-      width: 120,
-      align: "center",
-      render: (url) => {
-        if (!url) return "-";
-
-        const imagePath = `http://localhost:3000/${url.replace(/\\/g, "/")}`;
-
-        return (
-          <img
-            src={imagePath}
-            alt="stage"
-            style={{
-              width: 32,
-              height: 32,
-              objectFit: "cover",
-              borderRadius: 6,
-            }}
-          />
-        );
-      },
-    },
-    {
       title: "Tên công đoạn",
       dataIndex: "stage_name",
       key: "stage_name",
       ellipsis: true,
     },
     {
-      title: "Số lượng",
-      dataIndex: "stage_quantity",
-      key: "stage_quantity",
-      align: "center",
+      title: "Tên nhân công",
+      dataIndex: "worker_name",
+      key: "worker_name",
+      ellipsis: true,
     },
     {
-      title: "Giá",
-      dataIndex: "price",
-      key: "price",
+      title: "Số lượng",
+      dataIndex: "assigned_quantity",
+      key: "assigned_quantity",
       align: "center",
     },
     {
@@ -75,16 +50,12 @@ function StageTable({ stages, onAssign, onEdit, onDelete }) {
       align: "center",
       render: (_, record) => (
         <div onClick={(e) => e.stopPropagation()}>
-          <Button type="link" onClick={() => onAssign(record)}>
-            Phân công
-          </Button>
-
           <Button type="link" onClick={() => onEdit(record)}>
             Sửa
           </Button>
 
           <Popconfirm
-            title="Xóa công đoạn?"
+            title="Xóa phân công?"
             description="Bạn chắc chắn muốn xóa?"
             onConfirm={() => onDelete(record)}
             okText="Xóa"
@@ -119,4 +90,4 @@ function StageTable({ stages, onAssign, onEdit, onDelete }) {
   );
 }
 
-export default StageTable;
+export default AssignTable;

@@ -36,6 +36,16 @@ const Navigate = () => {
           label: "Hàng",
         },
         {
+          key: "/stages",
+          icon: <InboxOutlined />,
+          label: "Công đoạn",
+        },
+        {
+          key: "/assigns",
+          icon: <InboxOutlined />,
+          label: "Phân công",
+        },
+        {
           key: "/workers",
           icon: <IdcardOutlined />,
           label: "Nhân công",

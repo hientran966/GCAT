@@ -20,6 +20,7 @@ CREATE TABLE products (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     code VARCHAR(100) UNIQUE NOT NULL,      -- mã sản phẩm
     name VARCHAR(255) NOT NULL,
+    done_quantity INT DEFAULT 0,
     total_quantity INT NOT NULL,            -- tổng số lượng phải làm
     image_url VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -34,6 +35,7 @@ CREATE TABLE product_stages (
     product_id BIGINT NOT NULL,
     stage_name VARCHAR(255) NOT NULL,       -- tên công đoạn
     price DECIMAL(10,2) NOT NULL,           -- giá trả cho công đoạn
+    done_quantity INT DEFAULT 0,
     stage_quantity INT NOT NULL,            -- SL yêu cầu trong công đoạn
 	image_url VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -47,6 +49,7 @@ CREATE TABLE stage_assignments (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     stage_id BIGINT NOT NULL,
     account_id BIGINT NOT NULL,
+    done_quantity INT DEFAULT 0,
     assigned_quantity INT NOT NULL,         -- giao bao nhiêu sản phẩm trong công đoạn
     assigned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     deleted_at TIMESTAMP NULL,
@@ -60,7 +63,7 @@ CREATE TABLE daily_reports (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     stages_id BIGINT NOT NULL,
     account_id BIGINT NOT NULL,              -- người báo cáo
-    quantity_done INT NOT NULL,             -- số lượng đã làm trong ngày
+    reported_quantity INT NOT NULL,             -- số lượng đã làm trong ngày
     note TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     deleted_at TIMESTAMP NULL,
