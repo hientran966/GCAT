@@ -2,7 +2,8 @@ export const selectStageById = (state, id) =>
   state.stage.stages.find(p => p.id === id);
 
 export const selectFilteredStages = (state ) => {
-  const { stages, searchTerm } = state.stage;
+  const stages = state.stage?.stages || [];
+  const searchTerm = state.stage?.searchTerm || "";
 
   let filtered = stages;
 

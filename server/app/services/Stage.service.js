@@ -51,12 +51,6 @@ class StageService {
     if (!payload.price) throw new Error("Cần có giá công đoạn");
     if (!payload.stage_quantity) throw new Error("Cần có số lượng công đoạn");
 
-    const [product_id] = await this.mysql.execute(
-      "SELECT id FROM products WHERE id = ?",
-      [payload.product_id]
-    );
-    if (product_id.length === 0) throw new Error("Sản phẩm không tồn tại");
-
     const stage = await this.extractStageData(payload);
     let file_url = null;
     if (payload.file) {
@@ -67,6 +61,18 @@ class StageService {
  
     try {
       await connection.beginTransaction();
+
+      
+      const [product_id] = await this.mysql.execute(
+        "SELECT id, total_quantity FROM products WHERE id = ?",
+        [stage.product_id]
+      );
+      if (product_id.length === 0) throw new Error("Sản phẩm không tồn tại");
+      if (stage.stage_quantity > product_id[0].total_quantity) {
+        throw new Error(
+          `Số lượng công đoạn không được vượt quá tổng số lượng sản phẩm (${product_id[0].total_quantity})`
+        );
+      }
 
       const [result] = await connection.execute(
         `INSERT INTO product_stages (product_id, stage_name, price, stage_quantity, image_url)

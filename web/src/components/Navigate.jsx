@@ -1,7 +1,9 @@
 import { Menu } from "antd";
 import {
   InboxOutlined,
+  BarcodeOutlined,
   IdcardOutlined,
+  TeamOutlined,
   LogoutOutlined,
 } from "@ant-design/icons";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -37,17 +39,17 @@ const Navigate = () => {
         },
         {
           key: "/stages",
-          icon: <InboxOutlined />,
+          icon: <BarcodeOutlined />,
           label: "Công đoạn",
         },
         {
           key: "/assigns",
-          icon: <InboxOutlined />,
+          icon: <IdcardOutlined />,
           label: "Phân công",
         },
         {
           key: "/workers",
-          icon: <IdcardOutlined />,
+          icon: <TeamOutlined />,
           label: "Nhân công",
         },
         {

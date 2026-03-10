@@ -1,30 +1,30 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import AssignService from "@/services/Assign.service";
+import AccountService from "@/services/Account.service";
 
 /* =====================
    ASYNC THUNKS
 ===================== */
 
-// fetchAssigns
-export const fetchAssigns = createAsyncThunk(
-  "assign/fetchAssigns",
+// fetchAccounts
+export const fetchAccounts = createAsyncThunk(
+  "account/fetchAccounts",
   async (__, { rejectWithValue }) => {
     try {
-      const assigns = await AssignService.getAllAssign();
-      return assigns;
+      const accounts = await AccountService.getAllAccount();
+      return accounts;
     } catch (err) {
       return rejectWithValue(err.response?.data || err.message);
     }
   }
 );
 
-// updateAssign
-export const updateAssign = createAsyncThunk(
-  "assign/updateAssign",
+// updateAccount
+export const updateAccount = createAsyncThunk(
+  "account/updateAccount",
   async (payload, { dispatch, rejectWithValue }) => {
     try {
-      await AssignService.updateAssign(payload.id, payload);
-      dispatch(fetchAssigns());
+      await AccountService.updateAccount(payload.id, payload);
+      dispatch(fetchAccounts());
       return payload;
     } catch (err) {
       return rejectWithValue(err.response?.data || err.message);
@@ -36,18 +36,18 @@ export const updateAssign = createAsyncThunk(
    SLICE
 ===================== */
 
-const assignSlice = createSlice({
-  name: "assign",
+const accountSlice = createSlice({
+  name: "account",
   initialState: {
-    assigns: [],
+    accounts: [],
     loading: false,
     searchTerm: "",
     error: null,
   },
 
   reducers: {
-    addAssign(state, action) {
-      state.assigns.push(action.payload);
+    addAccount(state, action) {
+      state.accounts.push(action.payload);
     },
 
     setSearch(state, action) {
@@ -57,15 +57,15 @@ const assignSlice = createSlice({
 
   extraReducers: (builder) => {
     builder
-      /* fetchAssigns */
-      .addCase(fetchAssigns.pending, (state) => {
+      /* fetchAccounts */
+      .addCase(fetchAccounts.pending, (state) => {
         state.loading = true;
       })
-      .addCase(fetchAssigns.fulfilled, (state, action) => {
+      .addCase(fetchAccounts.fulfilled, (state, action) => {
         state.loading = false;
-        state.assigns = action.payload.map(p => ({ ...p }));
+        state.accounts = action.payload.map(p => ({ ...p }));
       })
-      .addCase(fetchAssigns.rejected, (state, action) => {
+      .addCase(fetchAccounts.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });
@@ -77,8 +77,8 @@ const assignSlice = createSlice({
 ===================== */
 
 export const {
-  addAssign,
+  addaccount,
   setSearch,
-} = assignSlice.actions;
+} = accountSlice.actions;
 
-export default assignSlice.reducer;
+export default accountSlice.reducer;

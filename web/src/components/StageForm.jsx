@@ -13,6 +13,7 @@ import {
 import { UploadOutlined } from "@ant-design/icons";
 
 import StageService from "@/services/Stage.service";
+import { fetchProducts } from "@/stores/productSlice";
 import { selectFilteredProducts } from "@/stores/productSelectors";
 
 const StageForm = ({ open, onClose, onStageAdded, stage }) => {
@@ -44,6 +45,7 @@ const StageForm = ({ open, onClose, onStageAdded, stage }) => {
       setSelectedProduct(null);
       setFileList([]);
     }
+    fetchProducts();
   }, [stage]);
 
   const submit = async () => {
@@ -109,6 +111,7 @@ const StageForm = ({ open, onClose, onStageAdded, stage }) => {
             onChange={(value) => {
               const product = products.find((p) => p.code === value);
               setSelectedProduct(product);
+              form.setFieldsValue({ stage_quantity: undefined });
             }}
           >
             {products.map((p) => (
@@ -132,19 +135,22 @@ const StageForm = ({ open, onClose, onStageAdded, stage }) => {
         <Form.Item
           label="Số lượng"
           name="stage_quantity"
+          dependencies={["product_code"]}
           rules={[
             { required: true, message: "Bắt buộc" },
             {
               validator: (_, value) => {
                 if (!selectedProduct) return Promise.resolve();
+                
                 const numValue = Number(value);
                 if (isNaN(numValue) || numValue <= 0) {
                   return Promise.reject(new Error("Số lượng phải là số dương"));
                 }
-                if (numValue + selectedProduct.assigned_quantity > selectedProduct.total_quantity) {
+
+                if (numValue > selectedProduct.total_quantity){
                   return Promise.reject(
                     new Error(
-                      `Không được vượt quá ${selectedProduct.total_quantity - selectedProduct.assigned_quantity}`
+                      `Không được vượt quá ${selectedProduct.total_quantity}`
                     )
                   );
                 }

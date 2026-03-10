@@ -10,6 +10,9 @@ import { initSocket, disconnectSocket } from "@/plugins/socket";
    Redux actions
 ======================= */
 import { fetchProducts } from "@/stores/productSlice";
+import { fetchStages } from "@/stores/stageSlice";
+import { fetchAssigns } from "@/stores/assignSlice";
+import { fetchAccounts } from "@/stores/accountSlice";
 
 import "@/assets/css/App.css";
 
@@ -24,7 +27,7 @@ function App() {
   useEffect(() => {
     let socket;
     const user = JSON.parse(localStorage.getItem("user") || "{id: 1}");
-    if (!user?.id) return;
+    //if (!user?.id) return;
 
     socket = initSocket(user.id);
 

@@ -2,7 +2,8 @@ export const selectProductById = (state, id) =>
   state.product.products.find(p => p.id === id);
 
 export const selectFilteredProducts = (state) => {
-  const { products, searchTerm } = state.product;
+  const products = state.product?.products || [];
+  const searchTerm = state.product?.searchTerm || "";
 
   if (!searchTerm) return products;
 

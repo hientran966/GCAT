@@ -10,13 +10,18 @@ import {
 } from "antd";
 
 import AssignService from "@/services/Assign.service";
+import { fetchStages } from "../stores/stageSlice";
 import { selectFilteredStages } from "@/stores/stageSelectors";
+import { fetchAccounts } from "../stores/accountSlice";
+import { selectFilteredAccounts } from "../stores/accountSelectors";
 
-const AssignForm = ({ open, onClose, onAssignAdded, assign }) => {
+const AssignForm = ({ open, onClose, onAssignAdded, assign, stage }) => {
   const stages = useSelector(selectFilteredStages);
+  const accounts = useSelector(selectFilteredAccounts);
 
   const [form] = Form.useForm();
   const [selectedStage, setSelectedStage] = useState(null);
+  const [selectedAccount, setSelectedAccount] = useState(null);
 
   useEffect(() => {
     if (assign) {
@@ -28,6 +33,8 @@ const AssignForm = ({ open, onClose, onAssignAdded, assign }) => {
       form.resetFields();
       setSelectedStage(null);
     }
+    fetchStages();
+    fetchAccounts();
   }, [assign]);
 
   const submit = async () => {
@@ -85,13 +92,13 @@ const AssignForm = ({ open, onClose, onAssignAdded, assign }) => {
             placeholder="Nhập để tìm công đoạn"
             optionFilterProp="children"
             onChange={(value) => {
-              const stage = stages.find((p) => p.id === value);
+              const stage = stages.find((s) => s.id === value);
               setSelectedStage(stage);
             }}
           >
-            {stages.map((p) => (
-              <Select.Option key={p.id} value={p.id}>
-                {p.code}
+            {stages.map((stage) => (
+              <Select.Option key={stage.id} value={stage.id}>
+                {stage.product_code} - {stage.stage_name}
               </Select.Option>
             ))}
           </Select>
@@ -99,11 +106,25 @@ const AssignForm = ({ open, onClose, onAssignAdded, assign }) => {
 
         {/* WORKER */}
         <Form.Item
-          label="Nhân công"
+          label="Công nhân"
           name="account_id"
           rules={[{ required: true, message: "Bắt buộc" }]}
         >
-          <Input />
+          <Select
+            showSearch
+            placeholder="Nhập để tìm công nhân"
+            optionFilterProp="children"
+            onChange={(value) => {
+              const account = accounts.find((a) => a.id === value);
+              setSelectedAccount(account);
+            }}
+          >
+            {accounts.map((a) => (
+              <Select.Option key={a.id} value={a.id}>
+                {a.name}
+              </Select.Option>
+            ))}
+          </Select>
         </Form.Item>
 
         {/* QUANTITY */}

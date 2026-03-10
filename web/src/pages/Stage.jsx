@@ -5,6 +5,7 @@ import { message } from "antd";
 import Header from "@/components/Header";
 import StageTable from "@/components/StageTable";
 import StageForm from "@/components/StageForm";
+import AssignForm from "@/components/AssignForm";
 
 import StageService from "@/services/Stage.service";
 
@@ -25,18 +26,24 @@ function StagesView() {
      UI STATE
   ======================= */
   const [isFormOpen, setIsFormOpen] = useState(false);
-  const [editingStage, setEditingStage] = useState(null);
+  const [isAssignFormOpen, setIsAssignFormOpen] = useState(false);
+  const [selectedStage, setSelectedStage] = useState(null);
 
   /* =======================
      HANDLERS
   ======================= */
   const onAdd = () => {
-    setEditingStage(null);
+    setSelectedStage(null);
     setIsFormOpen(true);
   };
 
+  const onAssign = (stage) => {
+    setSelectedStage(stage);
+    setIsAssignFormOpen(true);
+  }
+
   const onEdit = (stage) => {
-    setEditingStage(stage);
+    setSelectedStage(stage);
     setIsFormOpen(true);
   };
 
@@ -49,6 +56,12 @@ function StagesView() {
   const onStageAdded = () => {
     dispatch(fetchStages());
     setIsFormOpen(false);
+    setSelectedStage(null);
+  };
+
+  const onAssignAdded = () => {
+    setSelectedStage(null);
+    setIsAssignFormOpen(false);
   };
 
   /* =======================
@@ -71,13 +84,19 @@ function StagesView() {
         stages={stages}
         onEdit={onEdit}
         onDelete={onDelete}
+        onAssign={onAssign}
       />
 
       <StageForm
         open={isFormOpen}
-        stage={editingStage}
+        stage={selectedStage}
         onClose={() => setIsFormOpen(false)}
         onStageAdded={onStageAdded}
+      />
+      <AssignForm
+        open={isAssignFormOpen}
+        onClose={() => setIsAssignFormOpen(false)}
+        onAssignAdded={onAssignAdded}
       />
     </>
   );
