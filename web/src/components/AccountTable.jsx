@@ -1,53 +1,42 @@
 import { useMemo, useState } from "react";
 import { Button, Table, Popconfirm } from "antd";
+import { useNavigate } from "react-router-dom";
 
 const PAGE_SIZE = 6;
 
-function AssignTable({ assigns, onEdit, onDelete }) {
+function AccountTable({ accounts, onEdit, onDelete }) {
+  const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
 
   /* ================= DATA SOURCE ================= */
   const dataSource = useMemo(
     () =>
-      assigns.map((p) => ({
+      accounts.map((p) => ({
         key: p.id,
         ...p,
       })),
-    [assigns]
+    [accounts]
   );
 
   /* ================= COLUMNS ================= */
   const columns = [
     {
-      title: "Mã hàng",
-      dataIndex: "product_code",
-      key: "product_code",
-      ellipsis: true,
-      width: 120,
-      align: "center",
-    },
-    {
-      title: "Tên công đoạn",
-      dataIndex: "stage_name",
-      key: "stage_name",
+      title: "Tên công nhân",
+      dataIndex: "name",
+      key: "name",
       ellipsis: true,
     },
     {
-      title: "Tên nhân công",
-      dataIndex: "worker_name",
-      key: "worker_name",
+      title: "Số điện thoại",
+      dataIndex: "phone",
+      key: "phone",
       ellipsis: true,
     },
     {
-      title: "Số lượng",
-      dataIndex: "assigned_quantity",
-      key: "assigned_quantity",
-      align: "center",
-      render: (_, record) => (
-        <span>
-          {record.done_quantity || 0}/{record.assigned_quantity}
-        </span>
-      ),
+      title: "Địa chỉ",
+      dataIndex: "address",
+      key: "address",
+      ellipsis: true,
     },
     {
       title: "Hành động",
@@ -60,7 +49,7 @@ function AssignTable({ assigns, onEdit, onDelete }) {
           </Button>
 
           <Popconfirm
-            title="Xóa phân công?"
+            title="Xóa công nhân?"
             description="Bạn chắc chắn muốn xóa?"
             onConfirm={() => onDelete(record)}
             okText="Xóa"
@@ -88,11 +77,13 @@ function AssignTable({ assigns, onEdit, onDelete }) {
         showSizeChanger: false,
       }}
       onRow={(record) => ({
-        onClick: () => {console.log(record)},
+        onClick: () => {
+          navigate(`/workers/${record.id}`);
+        },
       })}
-      rowClassName="stage-row"
+      rowClassName="account-row"
     />
   );
 }
 
-export default AssignTable;
+export default AccountTable;

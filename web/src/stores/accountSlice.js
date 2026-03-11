@@ -18,6 +18,19 @@ export const fetchAccounts = createAsyncThunk(
   }
 );
 
+// fetchAccountDetail
+export const fetchAccountDetail = createAsyncThunk(
+  "account/fetchAccountDetail",
+  async (id, { rejectWithValue }) => {
+    try {
+      const account = await AccountService.getAccountById(id);
+      return account;
+    } catch (err) {
+      return rejectWithValue(err.response?.data || err.message);
+    }
+  }
+);
+
 // updateAccount
 export const updateAccount = createAsyncThunk(
   "account/updateAccount",
@@ -40,6 +53,7 @@ const accountSlice = createSlice({
   name: "account",
   initialState: {
     accounts: [],
+    accountDetail: null,
     loading: false,
     searchTerm: "",
     error: null,
@@ -53,10 +67,15 @@ const accountSlice = createSlice({
     setSearch(state, action) {
       state.searchTerm = action.payload.toLowerCase();
     },
+
+    clearAccountDetail(state) {
+      state.accountDetail = null;
+    }
   },
 
   extraReducers: (builder) => {
     builder
+
       /* fetchAccounts */
       .addCase(fetchAccounts.pending, (state) => {
         state.loading = true;
@@ -68,8 +87,21 @@ const accountSlice = createSlice({
       .addCase(fetchAccounts.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+
+      /* fetchAccountDetail */
+      .addCase(fetchAccountDetail.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchAccountDetail.fulfilled, (state, action) => {
+        state.loading = false;
+        state.accountDetail = action.payload;
+      })
+      .addCase(fetchAccountDetail.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       });
-  },
+  }
 });
 
 /* =====================
@@ -77,8 +109,9 @@ const accountSlice = createSlice({
 ===================== */
 
 export const {
-  addaccount,
+  addAccount,
   setSearch,
+  clearAccountDetail
 } = accountSlice.actions;
 
 export default accountSlice.reducer;

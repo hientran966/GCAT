@@ -28,15 +28,17 @@ class AssignService {
         [payload.account_id],
       );
       if (account_id.length === 0) throw new Error("Nhân công không tồn tại");
+
       const [stage_id] = await this.mysql.execute(
         "SELECT id, assigned_quantity, stage_quantity FROM product_stages WHERE id = ?",
         [payload.stage_id],
       );
       if (stage_id.length === 0) throw new Error("Công đoạn không tồn tại");
-      if (
-        payload.assigned_quantity + stage_id[0].assigned_quantity >
-        stage_id[0].stage_quantity
-      ) {
+
+      const assignedQty = Number(payload.assigned_quantity);
+      const currentAssigned = Number(stage_id[0].assigned_quantity);
+      const stageQty = Number(stage_id[0].stage_quantity);
+      if (assignedQty + currentAssigned > stageQty) {
         throw new Error("Số lượng phân công vượt quá số lượng công đoạn");
       }
 

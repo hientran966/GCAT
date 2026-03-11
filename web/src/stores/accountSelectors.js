@@ -17,3 +17,6 @@ export const selectFilteredAccounts = (state ) => {
 
   return filtered;
 };
+
+export const selectAccountDetail = (state) =>
+  state.account.accountDetail;

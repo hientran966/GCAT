@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   Modal,
   Form,
@@ -17,6 +17,7 @@ import { fetchProducts } from "@/stores/productSlice";
 import { selectFilteredProducts } from "@/stores/productSelectors";
 
 const StageForm = ({ open, onClose, onStageAdded, stage }) => {
+  const dispatch = useDispatch();
   const products = useSelector(selectFilteredProducts);
 
   const [form] = Form.useForm();
@@ -45,7 +46,7 @@ const StageForm = ({ open, onClose, onStageAdded, stage }) => {
       setSelectedProduct(null);
       setFileList([]);
     }
-    fetchProducts();
+    dispatch(fetchProducts());
   }, [stage]);
 
   const submit = async () => {

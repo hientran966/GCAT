@@ -74,13 +74,57 @@ class AccountService {
 
   async findById(id) {
     const [rows] = await this.mysql.execute(
-      `SELECT id, name, phone, role, address FROM accounts WHERE id = ? AND deleted_at IS NULL`,
+      `SELECT id, name, phone, role, address
+      FROM accounts
+      WHERE id = ? AND deleted_at IS NULL`,
       [id]
     );
-    const account = rows[0] || null;
+
+    const account = rows[0];
     if (!account) throw new Error("Người dùng không tồn tại");
 
-    return account;
+    const [assignments] = await this.mysql.execute(
+      `SELECT 
+        sa.id,
+        sa.stage_id,
+        sa.account_id,
+        sa.done_quantity,
+        sa.assigned_quantity,
+
+        p.code AS product_code,
+        ps.stage_name,
+        ps.price
+
+      FROM stage_assignments sa
+      JOIN product_stages ps ON sa.stage_id = ps.id
+      JOIN products p ON ps.product_id = p.id
+
+      WHERE sa.deleted_at IS NULL
+      AND sa.account_id = ?`,
+      [id]
+    );
+
+    const [monthlyStats] = await this.mysql.execute(
+      `SELECT 
+        DATE_FORMAT(dr.created_at,'%Y-%m') AS month,
+        SUM(ps.price * dr.reported_quantity) AS total_money
+
+      FROM daily_reports dr
+      JOIN product_stages ps ON dr.stages_id = ps.id
+
+      WHERE dr.account_id = ?
+      AND dr.deleted_at IS NULL
+
+      GROUP BY month
+      ORDER BY month DESC`,
+      [id]
+    );
+
+    return {
+      ...account,
+      assignments,
+      monthlyStats
+    };
   }
 
   async update(id, payload) {

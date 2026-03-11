@@ -4,6 +4,8 @@ import App from "../App";
 import Product from "../pages/Product";
 import Stage from "../pages/Stage";
 import Assign from "../pages/Assign";
+import Worker from "../pages/Worker";
+import WorkerDetail from "../pages/WorkerDetail";
 //import NotFound from "../pages/NotFound";
 
 /* =========================
@@ -47,6 +49,15 @@ export const router = createBrowserRouter([
         element: <Assign />,
       }, 
 
+      {
+        path: "workers",
+        element: <Worker />,
+      }, 
+
+      {
+        path: "workers/:id",
+        element: <WorkerDetail />,
+      },
       {
         path: "*",
         element: <Product />,

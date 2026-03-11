@@ -59,9 +59,13 @@ function StageTable({ stages, onAssign, onEdit, onDelete }) {
     },
     {
       title: "Số lượng",
-      dataIndex: "stage_quantity",
       key: "stage_quantity",
       align: "center",
+      render: (_, record) => (
+        <span>
+          {record.assigned_quantity || 0}/{record.stage_quantity}
+        </span>
+      ),
     },
     {
       title: "Giá",

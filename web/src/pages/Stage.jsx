@@ -97,6 +97,7 @@ function StagesView() {
         open={isAssignFormOpen}
         onClose={() => setIsAssignFormOpen(false)}
         onAssignAdded={onAssignAdded}
+        stage={selectedStage}
       />
     </>
   );

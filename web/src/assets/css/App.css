@@ -13,7 +13,7 @@
   background-image: url("../background.jpg");
   background-size: cover;
   width: 100vw;
-  height: calc(100vh - 80px);
+  height: calc(100vh - 46px);
 }
 
 html,

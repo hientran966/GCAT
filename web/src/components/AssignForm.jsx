@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   Modal,
   Form,
@@ -16,12 +16,12 @@ import { fetchAccounts } from "../stores/accountSlice";
 import { selectFilteredAccounts } from "../stores/accountSelectors";
 
 const AssignForm = ({ open, onClose, onAssignAdded, assign, stage }) => {
+  const dispatch = useDispatch();
   const stages = useSelector(selectFilteredStages);
   const accounts = useSelector(selectFilteredAccounts);
 
   const [form] = Form.useForm();
   const [selectedStage, setSelectedStage] = useState(null);
-  const [selectedAccount, setSelectedAccount] = useState(null);
 
   useEffect(() => {
     if (assign) {
@@ -29,13 +29,21 @@ const AssignForm = ({ open, onClose, onAssignAdded, assign, stage }) => {
 
       const stage = stages.find((p) => p.code === assign.stage_code);
       setSelectedStage(stage);
-    } else {
+    }
+    else if (stage) {
+      form.setFieldsValue({
+        stage_id: stage.id,
+      });
+
+      setSelectedStage(stage);
+    }  
+    else {
       form.resetFields();
       setSelectedStage(null);
     }
-    fetchStages();
-    fetchAccounts();
-  }, [assign]);
+    dispatch(fetchStages());
+    dispatch(fetchAccounts());
+  }, [assign, stage]);
 
   const submit = async () => {
     try {
@@ -114,10 +122,6 @@ const AssignForm = ({ open, onClose, onAssignAdded, assign, stage }) => {
             showSearch
             placeholder="Nhập để tìm công nhân"
             optionFilterProp="children"
-            onChange={(value) => {
-              const account = accounts.find((a) => a.id === value);
-              setSelectedAccount(account);
-            }}
           >
             {accounts.map((a) => (
               <Select.Option key={a.id} value={a.id}>
