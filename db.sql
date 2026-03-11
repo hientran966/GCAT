@@ -60,13 +60,13 @@ CREATE TABLE stage_assignments (
 DROP TABLE IF EXISTS daily_reports;
 CREATE TABLE daily_reports (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    stages_id BIGINT NOT NULL,
+    assign_id BIGINT NOT NULL,
     account_id BIGINT NOT NULL,              -- người báo cáo
     reported_quantity INT NOT NULL,             -- số lượng đã làm trong ngày
     note TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     deleted_at TIMESTAMP NULL,
-    FOREIGN KEY (stages_id) REFERENCES product_stages(id),
+    FOREIGN KEY (assign_id) REFERENCES stage_assignments(id),
     FOREIGN KEY (account_id) REFERENCES accounts(id)
 );
 

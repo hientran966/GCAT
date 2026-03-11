@@ -5,7 +5,7 @@ class ReportService {
 
   async extractReportData(payload) {
     const report = {
-      stages_id: payload.stages_id,
+      assign_id: payload.assign_id,
       account_id: payload.account_id,
       quantity_done: payload.quantity_done,
       note: payload.note || "",
@@ -16,12 +16,12 @@ class ReportService {
   async create(payload) {
     if (!payload) throw new Error("Không có dữ liệu đầu vào");
     if (!payload.account_id) throw new Error("Cần có người báo cáo");
-    if (!payload.stages_id) throw new Error("Cần có mã công đoạn");
+    if (!payload.assign_id) throw new Error("Cần có mã phân công");
     if (!payload.quantity_done) throw new Error("Cần có số lượng");
 
     const [assigned_quantity] = await this.mysql.execute(
-      "SELECT assigned_quantity FROM stage_assignments WHERE stage_id = ? AND account_id = ?",
-      [payload.stages_id, payload.account_id]
+      "SELECT assigned_quantity FROM stage_assignments WHERE id = ? AND deleted_at IS NULL",
+      [payload.assign_id]
     );
     if (assigned_quantity.length === 0) throw new Error("Phân công không tồn tại");
     if (payload.quantity_done > assigned_quantity[0].assigned_quantity) {
@@ -35,9 +35,9 @@ class ReportService {
       await connection.beginTransaction();
 
       const [result] = await connection.execute(
-        `INSERT INTO daily_reports (stages_id, account_id, quantity_done)
+        `INSERT INTO daily_reports (assign_id, account_id, quantity_done)
           VALUES (?, ?, ?)`,
-        [report.stages_id, report.account_id, report.quantity_done]
+        [report.assign_id, report.account_id, report.quantity_done]
       );
 
       await connection.commit();
@@ -52,12 +52,12 @@ class ReportService {
   }
 
   async find(filter = {}) {
-    let sql = `SELECT id, account_id, stages_id, quantity_done, note FROM daily_reports WHERE deleted_at IS NULL`;
+    let sql = `SELECT id, account_id, assign_id, quantity_done, note FROM daily_reports WHERE deleted_at IS NULL`;
     const params = [];
 
-    if (filter.stages_id) {
-      sql += " AND stages_id LIKE ?";
-      params.push(`%${filter.stages_id}%`);
+    if (filter.assign_id) {
+      sql += " AND assign_id LIKE ?";
+      params.push(`%${filter.assign_id}%`);
     }
 
     if (filter.account_id) {
@@ -71,7 +71,7 @@ class ReportService {
 
   async findById(id) {
     const [rows] = await this.mysql.execute(
-      `SELECT id, account_id, stages_id, quantity_done, note FROM daily_reports WHERE id = ? AND deleted_at IS NULL`,
+      `SELECT id, account_id, assign_id, quantity_done, note FROM daily_reports WHERE id = ? AND deleted_at IS NULL`,
       [id]
     );
     const report = rows[0] || null;
@@ -88,7 +88,7 @@ class ReportService {
     const currentReport = await this.findById(id);
     if (!currentReport) throw new Error("Báo cáo không tồn tại");
 
-    const ALLOWED_FIELDS = ["account_id", "stages_id", "quantity_done", "note"];
+    const ALLOWED_FIELDS = ["account_id", "assign_id", "quantity_done", "note"];
 
     const filteredPayload = Object.fromEntries(
       Object.entries(payload).filter(([key]) => ALLOWED_FIELDS.includes(key))

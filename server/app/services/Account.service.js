@@ -96,8 +96,8 @@ class AccountService {
         ps.price
 
       FROM stage_assignments sa
-      JOIN product_stages ps ON sa.stage_id = ps.id
-      JOIN products p ON ps.product_id = p.id
+      JOIN product_stages ps ON sa.stage_id = ps.id AND ps.deleted_at IS NULL
+      JOIN products p ON ps.product_id = p.id AND p.deleted_at IS NULL
 
       WHERE sa.deleted_at IS NULL
       AND sa.account_id = ?`,
@@ -110,7 +110,8 @@ class AccountService {
         SUM(ps.price * dr.reported_quantity) AS total_money
 
       FROM daily_reports dr
-      JOIN product_stages ps ON dr.stages_id = ps.id
+      JOIN stage_assignments sa ON dr.assign_id = sa.id AND sa.deleted_at IS NULL
+      JOIN product_stages ps ON sa.stage_id = ps.id AND ps.deleted_at IS NULL
 
       WHERE dr.account_id = ?
       AND dr.deleted_at IS NULL
