@@ -3,21 +3,18 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const API_URL = "https://eneida-junctional-ava.ngrok-free.dev";
 
-const commonConfig = {
-  baseURL: API_URL,
-  headers: {
-    Accept: "application/json",
-  },
-};
-
 export default (baseURL) => {
+
   const instance = axios.create({
     baseURL: API_URL + baseURL,
-    ...commonConfig,
+    headers: {
+      Accept: "application/json",
+    },
   });
 
   instance.interceptors.request.use(
     async (config) => {
+
       const token = await AsyncStorage.getItem("token");
 
       if (token) {

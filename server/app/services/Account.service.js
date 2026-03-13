@@ -93,6 +93,7 @@ class AccountService {
 
         p.code AS product_code,
         ps.stage_name,
+        ps.image_url,
         ps.price
 
       FROM stage_assignments sa

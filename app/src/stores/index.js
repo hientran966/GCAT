@@ -1,8 +1,8 @@
 import { configureStore } from "@reduxjs/toolkit";
-import productReducer from "@/stores/productSlice";
-import stageReducer from "@/stores/stageSlice";
-import assignReducer from "@/stores/assignSlice";
-import accountReducer from "@/stores/accountSlice";
+import productReducer from "./productSlice";
+import stageReducer from "./stageSlice";
+import assignReducer from "./assignSlice";
+import accountReducer from "./accountSlice";
 
 export const store = configureStore({
   reducer: {
