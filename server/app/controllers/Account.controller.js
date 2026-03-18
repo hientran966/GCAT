@@ -1,7 +1,9 @@
 const { createController } = require("./controllerFactory");
 const AuthService = require("../services/Account.service");
 const ApiError = require("../api-error");
+
 const MySQL = require("../utils/mysql.util");
+const Redis = require("../utils/redis");
 
 const baseController = createController(AuthService, {
     create: "Có lỗi xảy ra khi tạo tài khoản",

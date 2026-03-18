@@ -1,9 +1,14 @@
 // controllerFactory.js
 const ApiError = require("../api-error");
 const MySQL = require("../utils/mysql.util");
+const Redis = require("../utils/redis");
 
 function createController(ServiceClass, messages = {}) {
-    const getService = () => new ServiceClass(MySQL.pool || MySQL.connection);
+    const getService = () =>
+        new ServiceClass(
+            MySQL.pool || MySQL.connection,
+            Redis.client
+        );
 
     return {
         // Tạo mới

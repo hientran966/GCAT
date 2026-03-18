@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { View, StyleSheet, FlatList } from "react-native";
 
-import { ActivityIndicator } from "react-native-paper";
+import { ActivityIndicator, Appbar } from "react-native-paper";
 
 import { useDispatch, useSelector } from "react-redux";
 
@@ -11,7 +11,6 @@ import { selectAccountDetail } from "../stores/accountSelectors";
 import AssignmentCard from "../components/AssignmentCard";
 
 export default function HomeScreen() {
-
   const dispatch = useDispatch();
 
   const accountDetail = useSelector(selectAccountDetail);
@@ -23,21 +22,30 @@ export default function HomeScreen() {
 
   const assignments = accountDetail?.assignments || [];
 
-  if (loading) {
-    return (
-      <View style={styles.center}>
-        <ActivityIndicator size="large" />
-      </View>
-    );
-  }
-
   return (
-    <FlatList
-      data={assignments}
-      keyExtractor={(item) => item.id.toString()}
-      renderItem={({ item }) => <AssignmentCard item={item} />}
-      contentContainerStyle={styles.container}
-    />
+    <View style={{ flex: 1 }}>
+      
+      {/* APP BAR */}
+      <Appbar.Header>
+        <Appbar.Content title="Trang chủ" />
+        <Appbar.Action icon="refresh" onPress={() => dispatch(fetchAccountDetail(1))} />
+      </Appbar.Header>
+
+      {/* CONTENT */}
+      {loading ? (
+        <View style={styles.center}>
+          <ActivityIndicator size="large" />
+        </View>
+      ) : (
+        <FlatList
+          data={assignments}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={({ item }) => <AssignmentCard item={item} />}
+          contentContainerStyle={styles.container}
+        />
+      )}
+
+    </View>
   );
 }
 

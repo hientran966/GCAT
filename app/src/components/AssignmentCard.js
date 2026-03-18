@@ -1,5 +1,5 @@
 import { StyleSheet, Image } from "react-native";
-import { Card, Text } from "react-native-paper";
+import { Card, Text, Button } from "react-native-paper";
 
 export default function AssignmentCard({ item }) {
 
@@ -35,6 +35,10 @@ export default function AssignmentCard({ item }) {
 
       </Card.Content>
 
+      <Card.Actions>
+        <Button>Ghi Sổ</Button>
+      </Card.Actions>
+
     </Card>
   );
 }
@@ -42,7 +46,6 @@ export default function AssignmentCard({ item }) {
 const styles = StyleSheet.create({
   card: {
     marginBottom: 12,
-    backgroundColor: "#fff"
   },
 
   row: {
@@ -62,11 +65,6 @@ const styles = StyleSheet.create({
   },
 
   title: {
-    color: "#000",
     fontWeight: "bold"
   },
-
-  text: {
-    color: "#000"
-  }
 });

@@ -2,6 +2,7 @@ const http = require("http");
 const app = require("./app");
 const config = require("./app/config");
 const MySQL = require("./app/utils/mysql.util");
+const Redis = require("./app/utils/redis");
 const initSocket = require("./app/socket/index");
 
 async function startServer() {
@@ -12,8 +13,10 @@ async function startServer() {
             password: config.db.password,
             database: config.db.database,
         });
-
         console.log("Connected to the database!");
+
+        await Redis.connectRedis();
+        console.log("Connected to Redis!");
 
         const PORT = config.app.port;
         const server = http.createServer(app);

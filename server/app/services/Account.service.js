@@ -2,8 +2,9 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 class AccountService {
-  constructor(mysql) {
+  constructor(mysql, redisClient) {
     this.mysql = mysql;
+    this.redis = redisClient;
   }
 
   async extractAccountData(payload) {
@@ -55,6 +56,11 @@ class AccountService {
   }
 
   async find(filter = {}) {
+    const cacheKey = `accounts:${JSON.stringify(filter)}`;
+
+    const cached = await this.redis.get(cacheKey);
+    if (cached) return JSON.parse(cached);
+
     let sql = `SELECT id, name, phone, role, address FROM accounts WHERE deleted_at IS NULL`;
     const params = [];
 
@@ -69,10 +75,22 @@ class AccountService {
     }
 
     const [rows] = await this.mysql.execute(sql, params);
+
+    await this.redis.set(cacheKey, JSON.stringify(rows), {
+      EX: 120,
+    });
+
     return rows;
   }
 
   async findById(id) {
+    const cacheKey = `account:${id}`;
+
+    const cached = await this.redis.get(cacheKey);
+    if (cached) {
+      return JSON.parse(cached);
+    }
+
     const [rows] = await this.mysql.execute(
       `SELECT id, name, phone, role, address
       FROM accounts
@@ -90,16 +108,13 @@ class AccountService {
         sa.account_id,
         sa.done_quantity,
         sa.assigned_quantity,
-
         p.code AS product_code,
         ps.stage_name,
         ps.image_url,
         ps.price
-
       FROM stage_assignments sa
       JOIN product_stages ps ON sa.stage_id = ps.id AND ps.deleted_at IS NULL
       JOIN products p ON ps.product_id = p.id AND p.deleted_at IS NULL
-
       WHERE sa.deleted_at IS NULL
       AND sa.account_id = ?`,
       [id]
@@ -109,24 +124,27 @@ class AccountService {
       `SELECT 
         DATE_FORMAT(dr.created_at,'%Y-%m') AS month,
         SUM(ps.price * dr.reported_quantity) AS total_money
-
       FROM daily_reports dr
       JOIN stage_assignments sa ON dr.assign_id = sa.id AND sa.deleted_at IS NULL
       JOIN product_stages ps ON sa.stage_id = ps.id AND ps.deleted_at IS NULL
-
       WHERE dr.account_id = ?
       AND dr.deleted_at IS NULL
-
       GROUP BY month
       ORDER BY month DESC`,
       [id]
     );
 
-    return {
+    const result = {
       ...account,
       assignments,
-      monthlyStats
+      monthlyStats,
     };
+
+    await this.redis.set(cacheKey, JSON.stringify(result), {
+      EX: 300,
+    });
+
+    return result;
   }
 
   async update(id, payload) {
@@ -160,6 +178,9 @@ class AccountService {
     params.push(id);
 
     await this.mysql.execute(sql, params);
+
+    await this.redis.del(`account:${id}`);
+
     return this.findById(id);
   }
 
@@ -171,6 +192,9 @@ class AccountService {
       deletedAt,
       id,
     ]);
+
+    await this.redis.del(`account:${id}`);
+
     return { ...account, deleted_at: deletedAt };
   }
 
@@ -179,6 +203,9 @@ class AccountService {
       "UPDATE accounts SET deleted_at = NULL WHERE id = ?",
       [id]
     );
+
+    await this.redis.del(`account:${id}`);
+
     return result.affectedRows > 0;
   }
 
