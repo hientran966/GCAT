@@ -1,3 +1,7 @@
+SELECT 'INIT SQL RUNNING' as test;
+CREATE DATABASE IF NOT EXISTS GCAT;
+USE GCAT;
+
 SET FOREIGN_KEY_CHECKS = 0;
 
 -- WORKERS (Nhân công)
@@ -7,7 +11,7 @@ CREATE TABLE accounts (
     name VARCHAR(255) NOT NULL,
     phone VARCHAR(50),
 	password_hash VARCHAR(255) NOT NULL,
-    role ENUM('manager','user') DEFAULT 'worker',
+    role ENUM('manager','user') DEFAULT 'user',
     address VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -68,6 +72,16 @@ CREATE TABLE daily_reports (
     deleted_at TIMESTAMP NULL,
     FOREIGN KEY (assign_id) REFERENCES stage_assignments(id),
     FOREIGN KEY (account_id) REFERENCES accounts(id)
+);
+
+-- Seed admin
+INSERT INTO accounts (name, phone, password_hash, role, address)
+VALUES (
+    'Admin',
+    '0000000000',
+    '$2a$10$XVfM2b4ToCH4TGzfiOJu6eUL7YJWKMMWbk4Al6W0nREXco5gWcPGG', -- admin123
+    'manager',
+    'System'
 );
 
 SET FOREIGN_KEY_CHECKS = 1;

@@ -7,12 +7,7 @@ const initSocket = require("./app/socket/index");
 
 async function startServer() {
     try {
-        await MySQL.connect({
-            host: config.db.host,
-            user: config.db.username,
-            password: config.db.password,
-            database: config.db.database,
-        });
+        await MySQL.init();
         console.log("Connected to the database!");
 
         await Redis.connectRedis();

@@ -1,7 +1,10 @@
 const { createClient } = require("redis");
 
 const client = createClient({
-  url: process.env.REDIS_URL || "redis://localhost:6379",
+  socket: {
+    host: process.env.REDIS_HOST || "redis",
+    port: process.env.REDIS_PORT || 6379,
+  },
 });
 
 client.on("error", (err) => {
