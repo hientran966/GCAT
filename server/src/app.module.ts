@@ -6,13 +6,14 @@ import { OperationsModule } from './modules/operations/operations.module';
 import { AssignmentsModule } from './modules/assignments/assignments.module';
 import { ReportsModule } from './modules/reports/reports.module';
 import { AuthModule } from './modules/auth/auth.module';
-import { MySQLProvider } from './database/mysql.provider';
+import { DatabaseModule } from './database/database.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+    DatabaseModule,
     UsersModule,
     ProductsModule,
     OperationsModule,
@@ -20,7 +21,5 @@ import { MySQLProvider } from './database/mysql.provider';
     ReportsModule,
     AuthModule,
   ],
-  providers: [MySQLProvider],
-  exports: ['MYSQL'],
 })
 export class AppModule {}

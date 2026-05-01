@@ -1,12 +1,21 @@
 import { diskStorage } from 'multer';
-import { extname } from 'path';
+import { extname, join } from 'path';
+import { existsSync, mkdirSync } from 'fs';
 
-export const multerConfig = {
+export const multerConfig = (folder: string) => ({
   storage: diskStorage({
-    destination: './uploads/products',
+    destination: (req, file, cb) => {
+      const uploadPath = join('./uploads', folder);
+
+      if (!existsSync(uploadPath)) {
+        mkdirSync(uploadPath, { recursive: true });
+      }
+
+      cb(null, uploadPath);
+    },
     filename: (req, file, cb) => {
-      const unique = Date.now() + '-' + Math.round(Math.random() * 1e9);
+      const unique = Date.now() + '-' + Math.random();
       cb(null, unique + extname(file.originalname));
     },
   }),
-};
+});

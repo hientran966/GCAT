@@ -11,9 +11,12 @@ export class ReportsService {
 
   // ================= GET ALL
   async findAll(query: any) {
-    const { page = 1, limit = 10, worker_id, from_date, to_date } = query;
+    const { page, limit, worker_id, from_date, to_date } = query;
 
-    const offset = (page - 1) * limit;
+    const pageNum = Number(page) || 1;
+    const limitNum = Number(limit) || 10;
+
+    const offset = (pageNum - 1) * limitNum;
 
     let where = `WHERE r.deleted_at IS NULL`;
     const params: any[] = [];
@@ -48,9 +51,9 @@ export class ReportsService {
       LEFT JOIN products p ON p.id = o.product_id
       ${where}
       ORDER BY r.report_date DESC
-      LIMIT ? OFFSET ?
+      LIMIT ${limitNum} OFFSET ${offset}
       `,
-      [...params, Number(limit), Number(offset)],
+      [...params],
     );
 
     const [count]: any = await this.db.execute(
@@ -63,8 +66,8 @@ export class ReportsService {
     return {
       data: rows,
       total: count[0].total,
-      page: Number(page),
-      limit: Number(limit),
+      page: pageNum,
+      limit: limitNum,
     };
   }
 

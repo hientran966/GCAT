@@ -11,8 +11,12 @@ export class ProductsService {
 
   // ================= GET ALL
   async findAll(query: any) {
-    const { page = 1, limit = 10, keyword } = query;
-    const offset = (page - 1) * limit;
+    const { page, limit, keyword } = query;
+
+    const pageNum = Number(page) || 1;
+    const limitNum = Number(limit) || 10;
+
+    const offset = (pageNum - 1) * limitNum;
 
     let where = `WHERE deleted_at IS NULL`;
     const params: any[] = [];
@@ -28,9 +32,9 @@ export class ProductsService {
       FROM products
       ${where}
       ORDER BY id DESC
-      LIMIT ? OFFSET ?
+      LIMIT ${limitNum} OFFSET ${offset}
       `,
-      [...params, Number(limit), Number(offset)],
+      [...params],
     );
 
     const [count]: any = await this.db.execute(
@@ -41,8 +45,8 @@ export class ProductsService {
     return {
       data: rows,
       total: count[0].total,
-      page: Number(page),
-      limit: Number(limit),
+      page: pageNum,
+      limit: limitNum,
     };
   }
 

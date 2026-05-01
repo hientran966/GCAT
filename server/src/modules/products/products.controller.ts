@@ -33,14 +33,14 @@ export class ProductsController {
 
   // ================= CREATE
   @Post()
-  @UseInterceptors(FileInterceptor('file', multerConfig))
+  @UseInterceptors(FileInterceptor('file', multerConfig('products')))
   create(@Body() body: any, @UploadedFile() file: Express.Multer.File) {
     return this.service.create(body, file);
   }
 
   // ================= UPDATE
   @Put(':id')
-  @UseInterceptors(FileInterceptor('file', multerConfig))
+  @UseInterceptors(FileInterceptor('file', multerConfig('products')))
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() body: any,
