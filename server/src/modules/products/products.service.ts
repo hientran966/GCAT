@@ -10,7 +10,7 @@ export class ProductsService {
   constructor(@Inject('MYSQL') private readonly db: any) {}
 
   // ================= GET ALL
-  async findAll(query: any) {
+  async findAll(query: any, userId?: number) {
     const { page, limit, keyword } = query;
 
     const pageNum = Number(page) || 1;
@@ -24,6 +24,11 @@ export class ProductsService {
     if (keyword) {
       where += ` AND name LIKE ?`;
       params.push(`%${keyword}%`);
+    }
+
+    if (userId) {
+      where += ` AND created_by = ?`;
+      params.push(userId);
     }
 
     const [rows] = await this.db.execute(
