@@ -37,8 +37,10 @@ export class AssignmentsService {
         a.*,
         u.name as worker_name,
         o.name as operation_name,
+        o.image as operation_image,
         o.price,
-        p.code as product_code
+        p.code as product_code,
+        p.name as product_name
       FROM assignments a
       LEFT JOIN users u ON u.id = a.worker_id
       LEFT JOIN operations o ON o.id = a.operation_id
@@ -73,8 +75,10 @@ export class AssignmentsService {
         a.*,
         u.name as worker_name,
         o.name as operation_name,
+        o.image as operation_image,
         o.price,
-        p.code as product_code
+        p.code as product_code,
+        p.name as product_name
       FROM assignments a
       LEFT JOIN users u ON u.id = a.worker_id
       LEFT JOIN operations o ON o.id = a.operation_id

@@ -146,7 +146,7 @@ export class ReportsService {
     await this.db.execute(
       `
       UPDATE reports
-      SET quantity = ?, updated_at = NOW()
+      SET quantity = ?
       WHERE id = ?
       `,
       [quantity, id],

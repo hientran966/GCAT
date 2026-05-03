@@ -1,29 +1,84 @@
 "use client";
 
-import { useState } from "react";
+import { Form, Input, InputNumber, Modal, Space, Typography, message } from "antd";
+import { useEffect, useState } from "react";
 import { createReport } from "@/services/report.service";
+import type { Assignment } from "@/services/types";
 
-export default function ReportModal({ assignment, onClose }: any) {
-  const [quantity, setQuantity] = useState(0);
+type ReportModalProps = {
+  assignment: Assignment;
+  onClose: () => void;
+  onSuccess?: () => void;
+};
+
+type ReportFormValues = {
+  quantity: number;
+  report_date?: string;
+};
+
+const today = () => new Date().toISOString().slice(0, 10);
+
+export default function ReportModal({
+  assignment,
+  onClose,
+  onSuccess,
+}: ReportModalProps) {
+  const [form] = Form.useForm<ReportFormValues>();
+  const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    form.setFieldsValue({ quantity: 1, report_date: today() });
+  }, [assignment.id, form]);
 
   const handleSubmit = async () => {
-    await createReport({
-      assignment_id: assignment.id,
-      quantity,
-    });
-    onClose();
+    const values = await form.validateFields();
+    setSubmitting(true);
+
+    try {
+      await createReport({
+        assignment_id: assignment.id,
+        quantity: values.quantity,
+        report_date: values.report_date,
+      });
+      message.success("Đã gửi báo cáo");
+      onSuccess?.();
+      onClose();
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center">
-      <div className="bg-white p-4 rounded">
-        <h2>Nhập số lượng</h2>
-        <input
-          type="number"
-          onChange={(e) => setQuantity(Number(e.target.value))}
-        />
-        <button onClick={handleSubmit}>Gửi</button>
-      </div>
-    </div>
+    <Modal
+      title="Báo cáo sản lượng"
+      open
+      onCancel={onClose}
+      onOk={handleSubmit}
+      okText="Gửi"
+      cancelText="Đóng"
+      confirmLoading={submitting}
+      destroyOnHidden
+    >
+      <Space direction="vertical" size={4} style={{ marginBottom: 16 }}>
+        <Typography.Text strong>{assignment.operation_name}</Typography.Text>
+        <Typography.Text type="secondary">
+          {assignment.product_code} - Đơn giá{" "}
+          {Number(assignment.price ?? 0).toLocaleString("vi-VN")}
+        </Typography.Text>
+      </Space>
+
+      <Form form={form} layout="vertical">
+        <Form.Item
+          name="quantity"
+          label="Số lượng hoàn thành"
+          rules={[{ required: true, message: "Nhập số lượng" }]}
+        >
+          <InputNumber min={1} style={{ width: "100%" }} />
+        </Form.Item>
+        <Form.Item name="report_date" label="Ngày báo cáo">
+          <Input type="date" />
+        </Form.Item>
+      </Form>
+    </Modal>
   );
 }

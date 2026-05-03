@@ -143,7 +143,7 @@ export class OperationsService {
     await this.db.execute(
       `
       UPDATE operations
-      SET name = ?, price = ?, product_id = ?, image = ?, updated_at = NOW()
+      SET name = ?, price = ?, product_id = ?, image = ?
       WHERE id = ?
       `,
       [

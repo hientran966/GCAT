@@ -8,6 +8,7 @@ import {
   InputNumber,
   Modal,
   Popconfirm,
+  Select,
   Space,
   Table,
   Upload,
@@ -15,36 +16,41 @@ import {
 } from "antd";
 import type { UploadFile } from "antd";
 import { useEffect, useState } from "react";
-import {
-  createProduct,
-  deleteProduct,
-  getProducts,
-  updateProduct,
-} from "@/services/product.service";
 import { resolveFileUrl } from "@/services/api";
-import type { Product } from "@/services/types";
+import {
+  createOperation,
+  deleteOperation,
+  getOperations,
+  updateOperation,
+} from "@/services/operation.service";
+import { getProducts } from "@/services/product.service";
+import type { Operation, Product } from "@/services/types";
 
-type ProductFormValues = {
-  code: string;
+type OperationFormValues = {
   name: string;
-  supplier?: string;
-  total_quantity?: number;
+  price: number;
+  product_id: number;
   file?: UploadFile[];
 };
 
-export default function ProductsPage() {
-  const [data, setData] = useState<Product[]>([]);
+export default function OperationsPage() {
+  const [data, setData] = useState<Operation[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [open, setOpen] = useState(false);
-  const [editing, setEditing] = useState<Product | null>(null);
-  const [form] = Form.useForm<ProductFormValues>();
+  const [editing, setEditing] = useState<Operation | null>(null);
+  const [form] = Form.useForm<OperationFormValues>();
 
   const fetchData = async () => {
     setLoading(true);
     try {
-    const res = await getProducts();
-    setData(res.data);
+      const [operationsRes, productsRes] = await Promise.all([
+        getOperations({ limit: 100 }),
+        getProducts({ limit: 100 }),
+      ]);
+      setData(operationsRes.data);
+      setProducts(productsRes.data);
     } finally {
       setLoading(false);
     }
@@ -60,15 +66,12 @@ export default function ProductsPage() {
     setOpen(true);
   };
 
-  const openEdit = (record: Product) => {
+  const openEdit = (record: Operation) => {
     setEditing(record);
     form.setFieldsValue({
-      code: record.code,
       name: record.name,
-      supplier: record.supplier ?? undefined,
-      total_quantity: record.total_quantity
-        ? Number(record.total_quantity)
-        : undefined,
+      price: Number(record.price),
+      product_id: record.product_id,
       file: [],
     });
     setOpen(true);
@@ -81,19 +84,18 @@ export default function ProductsPage() {
 
     try {
       const payload = {
-        code: values.code,
         name: values.name,
-        supplier: values.supplier,
-        total_quantity: values.total_quantity,
+        price: values.price,
+        product_id: values.product_id,
         file,
       };
 
       if (editing) {
-        await updateProduct(editing.id, payload);
-        message.success("Đã cập nhật sản phẩm");
+        await updateOperation(editing.id, payload);
+        message.success("Đã cập nhật công đoạn");
       } else {
-        await createProduct(payload);
-        message.success("Đã thêm sản phẩm");
+        await createOperation(payload);
+        message.success("Đã thêm công đoạn");
       }
 
       setOpen(false);
@@ -104,17 +106,17 @@ export default function ProductsPage() {
   };
 
   const handleDelete = async (id: number) => {
-    await deleteProduct(id);
-    message.success("Đã xóa sản phẩm");
+    await deleteOperation(id);
+    message.success("Đã xóa công đoạn");
     await fetchData();
   };
 
   return (
     <Space orientation="vertical" size={16} style={{ width: "100%" }}>
       <Space style={{ justifyContent: "space-between", width: "100%" }}>
-        <h2 style={{ margin: 0 }}>Sản phẩm</h2>
+        <h2 style={{ margin: 0 }}>Công đoạn</h2>
         <Button type="primary" onClick={openCreate}>
-          Thêm sản phẩm
+          Thêm công đoạn
         </Button>
       </Space>
 
@@ -131,17 +133,20 @@ export default function ProductsPage() {
               image ? (
                 <Image
                   src={resolveFileUrl(image)}
-                  alt="product"
+                  alt="operation"
                   width={56}
                   height={56}
                   style={{ objectFit: "cover", borderRadius: 6 }}
                 />
               ) : null,
           },
-          { title: "Mã", dataIndex: "code" },
           { title: "Tên", dataIndex: "name" },
-          { title: "Nhà cung cấp", dataIndex: "supplier" },
-          { title: "Số lượng", dataIndex: "total_quantity" },
+          { title: "Mã sản phẩm", dataIndex: "product_code" },
+          {
+            title: "Giá",
+            dataIndex: "price",
+            render: (price) => Number(price).toLocaleString("vi-VN"),
+          },
           {
             title: "Thao tác",
             width: 160,
@@ -149,7 +154,7 @@ export default function ProductsPage() {
               <Space>
                 <Button onClick={() => openEdit(record)}>Sửa</Button>
                 <Popconfirm
-                  title="Xóa sản phẩm này?"
+                  title="Xóa công đoạn này?"
                   onConfirm={() => handleDelete(record.id)}
                 >
                   <Button danger>Xóa</Button>
@@ -161,7 +166,7 @@ export default function ProductsPage() {
       />
 
       <Modal
-        title={editing ? "Sửa sản phẩm" : "Thêm sản phẩm"}
+        title={editing ? "Sửa công đoạn" : "Thêm công đoạn"}
         open={open}
         onCancel={() => setOpen(false)}
         onOk={handleSubmit}
@@ -169,16 +174,24 @@ export default function ProductsPage() {
         destroyOnHidden
       >
         <Form form={form} layout="vertical">
-          <Form.Item name="code" label="Mã" rules={[{ required: true }]}>
+          <Form.Item
+            name="product_id"
+            label="Sản phẩm"
+            rules={[{ required: true }]}
+          >
+            <Select
+              showSearch
+              optionFilterProp="label"
+              options={products.map((product) => ({
+                value: product.id,
+                label: `${product.code} - ${product.name}`,
+              }))}
+            />
+          </Form.Item>
+          <Form.Item name="name" label="Tên công đoạn" rules={[{ required: true }]}>
             <Input />
           </Form.Item>
-          <Form.Item name="name" label="Tên" rules={[{ required: true }]}>
-            <Input />
-          </Form.Item>
-          <Form.Item name="supplier" label="Nhà cung cấp">
-            <Input />
-          </Form.Item>
-          <Form.Item name="total_quantity" label="Số lượng">
+          <Form.Item name="price" label="Đơn giá" rules={[{ required: true }]}>
             <InputNumber min={0} style={{ width: "100%" }} />
           </Form.Item>
           <Form.Item

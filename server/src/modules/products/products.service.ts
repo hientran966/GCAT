@@ -116,7 +116,7 @@ export class ProductsService {
     await this.db.execute(
       `
       UPDATE products
-      SET name = ?, code = ?, supplier = ?, image = ?, total_quantity = ?, updated_at = NOW()
+      SET name = ?, code = ?, supplier = ?, image = ?, total_quantity = ?
       WHERE id = ?
       `,
       [name, code, supplier || null, image, total_quantity || null, id],

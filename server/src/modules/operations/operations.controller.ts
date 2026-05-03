@@ -25,16 +25,16 @@ export class OperationsController {
     return this.service.findAll(query);
   }
 
+  // ================= GET BY PRODUCT
+  @Get('product/:productId')
+  getByProduct(@Param('productId', ParseIntPipe) productId: number) {
+    return this.service.getByProduct(productId);
+  }
+
   // ================= GET ONE
   @Get(':id')
   getOne(@Param('id', ParseIntPipe) id: number) {
     return this.service.findOne(id);
-  }
-
-  // ================= GET BY PRODUCT
-  @Get('/product/:productId')
-  getByProduct(@Param('productId', ParseIntPipe) productId: number) {
-    return this.service.getByProduct(productId);
   }
 
   // ================= CREATE

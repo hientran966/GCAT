@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { Layout, Menu } from "antd";
+import { Layout, Menu, Typography } from "antd";
 import { usePathname, useRouter } from "next/navigation";
 
 const { Header, Content } = Layout;
@@ -11,22 +11,31 @@ export default function JobsLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
 
   return (
-    <Layout className="min-h-screen">
-      <Header className="flex items-center">
+    <Layout style={{ minHeight: "100vh", background: "#f5f5f5" }}>
+      <Header
+        style={{
+          background: "#fff",
+          borderBottom: "1px solid #f0f0f0",
+          height: "auto",
+          padding: "12px 16px 0",
+        }}
+      >
+        <Typography.Title level={4} style={{ margin: "0 0 8px" }}>
+          GCAT Worker
+        </Typography.Title>
         <Menu
           mode="horizontal"
-          theme="dark"
           selectedKeys={[pathname === "/income" ? "income" : "jobs"]}
           onClick={(event) => router.push(`/${event.key}`)}
           items={[
-            { key: "jobs", label: "Jobs" },
-            { key: "income", label: "Income" },
+            { key: "jobs", label: "Công việc" },
+            { key: "income", label: "Thu nhập" },
           ]}
-          className="flex-1"
+          style={{ borderBottom: 0 }}
         />
       </Header>
 
-      <Content>{children}</Content>
+      <Content style={{ padding: 16 }}>{children}</Content>
     </Layout>
   );
 }

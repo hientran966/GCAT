@@ -122,7 +122,7 @@ export class UsersService {
     await this.db.execute(
       `
       UPDATE users
-      SET name = ?, role = ?, updated_at = NOW()
+      SET name = ?, role = ?
       WHERE id = ?
       `,
       [name, role, id],
@@ -149,10 +149,10 @@ export class UsersService {
 
     const hash = await bcrypt.hash(newPassword, 10);
 
-    await this.db.execute(
-      `UPDATE users SET password = ?, updated_at = NOW() WHERE id = ?`,
-      [hash, id],
-    );
+    await this.db.execute(`UPDATE users SET password = ? WHERE id = ?`, [
+      hash,
+      id,
+    ]);
 
     return { message: 'Password updated' };
   }

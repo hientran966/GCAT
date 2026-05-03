@@ -25,6 +25,12 @@ export class ReportsController {
     return this.service.findAll(query);
   }
 
+  // ================= SALARY
+  @Get('salary/summary')
+  getSalary(@Query() query: any) {
+    return this.service.getSalary(query);
+  }
+
   // ================= GET ONE
   @Get(':id')
   getOne(@Param('id', ParseIntPipe) id: number) {
@@ -49,9 +55,4 @@ export class ReportsController {
     return this.service.remove(id, req.user);
   }
 
-  // ================= SALARY
-  @Get('salary/summary')
-  getSalary(@Query() query: any) {
-    return this.service.getSalary(query);
-  }
 }
