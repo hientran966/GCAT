@@ -54,5 +54,4 @@ export class ReportsController {
   remove(@Param('id', ParseIntPipe) id: number, @Req() req: any) {
     return this.service.remove(id, req.user);
   }
-
 }

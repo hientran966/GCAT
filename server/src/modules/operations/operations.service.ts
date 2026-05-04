@@ -77,6 +77,22 @@ export class OperationsService {
     return rows[0];
   }
 
+  // ================= GET BY USER
+  async getByUser(userId: number) {
+    const [rows] = await this.db.execute(
+      `
+      SELECT o.*, p.code as product_code
+      FROM operations o
+      JOIN assignments a ON a.operation_id = o.id
+      JOIN products p ON p.id = o.product_id
+      WHERE a.worker_id = ? AND o.deleted_at IS NULL
+      ORDER BY o.id ASC
+      `,
+      [userId],
+    );
+    return rows;
+  }
+
   // ================= CREATE
   async create(data: any, file?: Express.Multer.File) {
     const { name, price, product_id } = data;

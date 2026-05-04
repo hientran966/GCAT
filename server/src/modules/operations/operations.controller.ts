@@ -10,12 +10,16 @@ import {
   ParseIntPipe,
   UseInterceptors,
   UploadedFile,
+  UseGuards,
+  Req,
 } from '@nestjs/common';
 import { OperationsService } from './operations.service';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { AuthGuard } from '../../common/guards/auth.guard';
 import { multerConfig } from '../../common/upload/upload.config';
 
 @Controller('operations')
+@UseGuards(AuthGuard)
 export class OperationsController {
   constructor(private readonly service: OperationsService) {}
 
@@ -29,6 +33,13 @@ export class OperationsController {
   @Get('product/:productId')
   getByProduct(@Param('productId', ParseIntPipe) productId: number) {
     return this.service.getByProduct(productId);
+  }
+
+  // ================= GET BY USER
+  @Get('me')
+  @UseGuards(AuthGuard)
+  getByUser(@Req() req: any) {
+    return this.service.getByUser(req.user.id);
   }
 
   // ================= GET ONE

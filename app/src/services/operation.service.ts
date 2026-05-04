@@ -40,6 +40,11 @@ export const getOperationsByProduct = async (
   return res.data;
 };
 
+export const getUserOperations = async (): Promise<Operation[]> => {
+  const res = await api.get(`/operations/me`);
+  return res.data;
+}
+
 export const createOperation = async (
   data: OperationPayload | FormData,
 ): Promise<Operation> => {

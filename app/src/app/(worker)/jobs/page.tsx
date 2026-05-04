@@ -10,7 +10,6 @@ import {
   Select,
   Space,
   Spin,
-  Statistic,
   Tag,
   Typography,
   message,
@@ -18,7 +17,7 @@ import {
 import { useCallback, useEffect, useState } from "react";
 import {
   createAssignment,
-  getAssignments,
+  getUserAssignments,
 } from "@/services/assignment.service";
 import { resolveFileUrl } from "@/services/api";
 import { getOperations } from "@/services/operation.service";
@@ -66,23 +65,15 @@ export default function JobsPage() {
     setWorkerId((current) => current ?? defaultWorkerId);
   };
 
-  const fetchData = useCallback(async (nextWorkerId = workerId) => {
+  const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await getAssignments({
-        limit: 100,
-        worker_id: nextWorkerId,
-      });
-      setData(res.data);
+      const res = await getUserAssignments();
+      setData(res);
     } finally {
       setLoading(false);
     }
-  }, [workerId]);
-
-  const handleWorkerChange = (value: number) => {
-    setWorkerId(value);
-    fetchData(value);
-  };
+  }, []);
 
   const openAssign = () => {
     form.resetFields();
@@ -99,7 +90,7 @@ export default function JobsPage() {
       message.success("Đã giao công đoạn");
       setAssignOpen(false);
       setWorkerId(values.worker_id);
-      await fetchData(values.worker_id);
+      await fetchData();
     } finally {
       setSubmitting(false);
     }
@@ -110,55 +101,20 @@ export default function JobsPage() {
   }, []);
 
   useEffect(() => {
-    if (workerId) fetchData(workerId);
+    if (workerId) fetchData();
   }, [fetchData, workerId]);
 
-  const totalValue = data.reduce(
-    (sum, item) => sum + Number(item.price ?? 0),
-    0,
-  );
-
   return (
-    <Space direction="vertical" size={16} style={{ width: "100%" }}>
+    <Space orientation="vertical" size={16} style={{ width: "100%" }}>
       <Card size="small">
-        <Space direction="vertical" size={12} style={{ width: "100%" }}>
+        <Space orientation="vertical" size={12} style={{ width: "100%" }}>
           <Space
             align="start"
             style={{ justifyContent: "space-between", width: "100%" }}
           >
-            <div>
-              <Typography.Title level={4} style={{ margin: 0 }}>
-                Công việc hôm nay
-              </Typography.Title>
-              <Typography.Text type="secondary">
-                Xem việc, báo cáo sản lượng và giao thêm công đoạn.
-              </Typography.Text>
-            </div>
             <Button type="primary" onClick={openAssign}>
               Giao việc
             </Button>
-          </Space>
-
-          <Select
-            showSearch
-            optionFilterProp="label"
-            placeholder="Chọn công nhân"
-            value={workerId}
-            onChange={handleWorkerChange}
-            style={{ width: "100%" }}
-            options={workers.map((worker) => ({
-              value: worker.id,
-              label: `${worker.name} - ${worker.phone}`,
-            }))}
-          />
-
-          <Space size={24} wrap>
-            <Statistic title="Công đoạn" value={data.length} />
-            <Statistic
-              title="Tổng đơn giá"
-              value={totalValue}
-              formatter={(value) => Number(value).toLocaleString("vi-VN")}
-            />
           </Space>
         </Space>
       </Card>
@@ -214,7 +170,7 @@ export default function JobsPage() {
                   </Button>,
                 ]}
               >
-                <Space direction="vertical" size={8} style={{ width: "100%" }}>
+                <Space orientation="vertical" size={8} style={{ width: "100%" }}>
                   <Space
                     style={{ justifyContent: "space-between", width: "100%" }}
                   >
@@ -245,12 +201,12 @@ export default function JobsPage() {
       )}
 
       <Modal
-        title="Giao cong doan"
+        title="Giao công đoạn"
         open={assignOpen}
         onCancel={() => setAssignOpen(false)}
         onOk={handleAssign}
-        okText="Giao viec"
-        cancelText="Dong"
+        okText="Giao việc"
+        cancelText="Đóng"
         confirmLoading={submitting}
         destroyOnHidden
       >

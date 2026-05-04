@@ -112,9 +112,9 @@ export default function IncomePage() {
   const maxAmount = Math.max(...chartData.map((item) => item.amount), 1);
 
   return (
-    <Space direction="vertical" size={16} style={{ width: "100%" }}>
+    <Space orientation="vertical" size={16} style={{ width: "100%" }}>
       <Card size="small">
-        <Space direction="vertical" size={12} style={{ width: "100%" }}>
+        <Space orientation="vertical" size={12} style={{ width: "100%" }}>
           <div>
             <Typography.Title level={4} style={{ margin: 0 }}>
               Thu nhập dự kiến
@@ -156,7 +156,7 @@ export default function IncomePage() {
       </Card>
 
       <Spin spinning={loading}>
-        <Space direction="vertical" size={16} style={{ width: "100%" }}>
+        <Space orientation="vertical" size={16} style={{ width: "100%" }}>
           <div
             style={{
               display: "grid",
@@ -185,7 +185,7 @@ export default function IncomePage() {
             {chartData.length === 0 ? (
               <Empty description="Chưa có dữ liệu" />
             ) : (
-              <Space direction="vertical" size={10} style={{ width: "100%" }}>
+              <Space orientation="vertical" size={10} style={{ width: "100%" }}>
                 {chartData.map((item) => (
                   <div key={item.date}>
                     <Space

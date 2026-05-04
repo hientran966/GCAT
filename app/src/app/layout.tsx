@@ -1,4 +1,5 @@
 import "antd/dist/reset.css";
+import AuthGate from "@/components/common/auth-gate";
 
 export default function RootLayout({
   children,
@@ -7,7 +8,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body style={{ margin: 0 }}>{children}</body>
+      <body style={{ margin: 0 }}>
+        <AuthGate>{children}</AuthGate>
+      </body>
     </html>
   );
 }

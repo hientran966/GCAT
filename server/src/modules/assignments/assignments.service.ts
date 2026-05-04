@@ -93,6 +93,30 @@ export class AssignmentsService {
     return rows[0];
   }
 
+  // ================= GET BY USER
+  async getByUser(userId: number) {
+    const [rows] = await this.db.execute(
+      `
+      SELECT 
+        a.*,
+        u.name as worker_name,
+        o.name as operation_name,
+        o.image as operation_image,
+        o.price,
+        p.code as product_code,
+        p.name as product_name
+      FROM assignments a
+      JOIN users u ON u.id = a.worker_id
+      JOIN operations o ON o.id = a.operation_id
+      JOIN products p ON p.id = o.product_id
+      WHERE a.worker_id = ? AND a.deleted_at IS NULL
+      ORDER BY a.id DESC
+      `,
+      [userId],
+    );
+    return rows;
+  }
+
   // ================= CREATE
   async create(data: any) {
     const { worker_id, operation_id } = data;

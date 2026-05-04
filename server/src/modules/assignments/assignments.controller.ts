@@ -8,6 +8,7 @@ import {
   Query,
   ParseIntPipe,
   UseGuards,
+  Req,
 } from '@nestjs/common';
 import { AssignmentsService } from './assignments.service';
 import { AuthGuard } from '../../common/guards/auth.guard';
@@ -21,6 +22,12 @@ export class AssignmentsController {
   @Get()
   getAll(@Query() query: any) {
     return this.service.findAll(query);
+  }
+
+  // ================= GET BY USER
+  @Get('me')
+  getByUser(@Req() req: any) {
+    return this.service.getByUser(req.user.id);
   }
 
   // ================= GET ONE

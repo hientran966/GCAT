@@ -59,7 +59,7 @@ export default function ReportModal({
       confirmLoading={submitting}
       destroyOnHidden
     >
-      <Space direction="vertical" size={4} style={{ marginBottom: 16 }}>
+      <Space orientation="vertical" size={4} style={{ marginBottom: 16 }}>
         <Typography.Text strong>{assignment.operation_name}</Typography.Text>
         <Typography.Text type="secondary">
           {assignment.product_code} - Đơn giá{" "}
