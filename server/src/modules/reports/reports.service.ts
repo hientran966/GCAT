@@ -98,14 +98,18 @@ export class ReportsService {
 
   // ================= CREATE
   async create(data: any) {
-    const { assignment_id, quantity, report_date } = data;
+    return this.createOne(data, this.db);
+  }
 
-    if (!assignment_id || !quantity) {
+  private async createOne(data: any, executor: any) {
+    const { assignment_id, quantity, report_date } = data;
+    const quantityNum = Number(quantity);
+
+    if (!assignment_id || !quantityNum || quantityNum < 1) {
       throw new BadRequestException('Missing required fields');
     }
 
-    // lấy assignment
-    const [assign]: any = await this.db.execute(
+    const [assign]: any = await executor.execute(
       `
       SELECT * FROM assignments
       WHERE id = ? AND deleted_at IS NULL
@@ -117,19 +121,51 @@ export class ReportsService {
       throw new BadRequestException('Assignment not found');
     }
 
-    const [res]: any = await this.db.execute(
+    const [res]: any = await executor.execute(
       `
       INSERT INTO reports
       (assignment_id, quantity, report_date)
       VALUES (?, ?, ?)
       `,
-      [assignment_id, quantity, report_date || new Date()],
+      [assignment_id, quantityNum, report_date || new Date()],
     );
 
     return {
       id: res.insertId,
-      quantity,
+      assignment_id,
+      quantity: quantityNum,
+      report_date,
     };
+  }
+
+  // ================= CREATE BULK
+  async createBulk(data: any) {
+    const reports = Array.isArray(data?.reports) ? data.reports : data;
+
+    if (!Array.isArray(reports) || reports.length === 0) {
+      throw new BadRequestException('reports is required');
+    }
+
+    const connection = await this.db.getConnection();
+    try {
+      await connection.beginTransaction();
+      const created: any[] = [];
+
+      for (const report of reports) {
+        created.push(await this.createOne(report, connection));
+      }
+
+      await connection.commit();
+      return {
+        data: created,
+        total: created.length,
+      };
+    } catch (error) {
+      await connection.rollback();
+      throw error;
+    } finally {
+      connection.release();
+    }
   }
 
   // ================= UPDATE

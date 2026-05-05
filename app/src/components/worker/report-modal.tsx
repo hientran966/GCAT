@@ -2,7 +2,7 @@
 
 import { Form, Input, InputNumber, Modal, Space, Typography, message } from "antd";
 import { useEffect, useState } from "react";
-import { createReport } from "@/services/report.service";
+import { addReportBookItem } from "@/components/worker/report-book";
 import type { Assignment } from "@/services/types";
 
 type ReportModalProps = {
@@ -16,7 +16,11 @@ type ReportFormValues = {
   report_date?: string;
 };
 
-const today = () => new Date().toISOString().slice(0, 10);
+const today = () => {
+  const date = new Date();
+  const offset = date.getTimezoneOffset() * 60000;
+  return new Date(date.getTime() - offset).toISOString().slice(0, 10);
+};
 
 export default function ReportModal({
   assignment,
@@ -35,12 +39,8 @@ export default function ReportModal({
     setSubmitting(true);
 
     try {
-      await createReport({
-        assignment_id: assignment.id,
-        quantity: values.quantity,
-        report_date: values.report_date,
-      });
-      message.success("Đã gửi báo cáo");
+      addReportBookItem(assignment, values.quantity, values.report_date);
+      message.success("Đã thêm vào sổ báo cáo");
       onSuccess?.();
       onClose();
     } finally {
@@ -50,11 +50,11 @@ export default function ReportModal({
 
   return (
     <Modal
-      title="Báo cáo sản lượng"
+      title="Ghi vào sổ báo cáo"
       open
       onCancel={onClose}
       onOk={handleSubmit}
-      okText="Gửi"
+      okText="Thêm vào sổ"
       cancelText="Đóng"
       confirmLoading={submitting}
       destroyOnHidden

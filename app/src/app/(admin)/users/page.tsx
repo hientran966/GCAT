@@ -21,6 +21,7 @@ import {
   updateUser,
 } from "@/services/user.service";
 import type { Role, User } from "@/services/types";
+import { useRouter } from "next/navigation";
 
 type UserFormValues = {
   phone: string;
@@ -41,6 +42,7 @@ const roleColor: Record<Role, string> = {
 };
 
 export default function UsersPage() {
+  const router = useRouter();
   const [data, setData] = useState<User[]>([]);
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -148,6 +150,10 @@ export default function UsersPage() {
         loading={loading}
         dataSource={data}
         rowKey="id"
+        onRow={(record) => ({
+          onClick: () => router.push(`/users/${record.id}`),
+          style: { cursor: "pointer" },
+        })}
         columns={[
           { title: "Tên", dataIndex: "name" },
           { title: "Số điện thoại", dataIndex: "phone" },
@@ -160,7 +166,7 @@ export default function UsersPage() {
             title: "Thao tác",
             width: 260,
             render: (_, record) => (
-              <Space>
+              <Space onClick={(event) => event.stopPropagation()}>
                 <Button onClick={() => openEdit(record)}>Sửa</Button>
                 <Button onClick={() => openPasswordModal(record)}>
                   Mật khẩu

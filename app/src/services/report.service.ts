@@ -47,6 +47,13 @@ export const createReport = async (data: ReportPayload): Promise<Report> => {
   return res.data;
 };
 
+export const createReports = async (
+  reports: ReportPayload[],
+): Promise<{ data: Report[]; total: number }> => {
+  const res = await api.post("/reports/bulk", { reports });
+  return res.data;
+};
+
 export const updateReport = async (
   id: Id,
   data: Pick<ReportPayload, "quantity">,

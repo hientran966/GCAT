@@ -15,6 +15,7 @@ import {
   message,
 } from "antd";
 import { useCallback, useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import {
   createAssignment,
   getUserAssignments,
@@ -40,6 +41,7 @@ const readStoredUser = () => {
 };
 
 export default function JobsPage() {
+  const searchParams = useSearchParams();
   const [data, setData] = useState<Assignment[]>([]);
   const [workers, setWorkers] = useState<User[]>([]);
   const [operations, setOperations] = useState<Operation[]>([]);
@@ -104,6 +106,20 @@ export default function JobsPage() {
     if (workerId) fetchData();
   }, [fetchData, workerId]);
 
+  const keyword = (searchParams.get("q") ?? "").trim().toLowerCase();
+  const filteredData = keyword
+    ? data.filter((item) =>
+        [
+          item.operation_name,
+          item.product_code,
+          item.product_name,
+          item.worker_name,
+        ]
+          .filter(Boolean)
+          .some((value) => String(value).toLowerCase().includes(keyword)),
+      )
+    : data;
+
   return (
     <Space orientation="vertical" size={16} style={{ width: "100%" }}>
       <Card size="small">
@@ -120,9 +136,9 @@ export default function JobsPage() {
       </Card>
 
       <Spin spinning={loading}>
-        {data.length === 0 ? (
+        {filteredData.length === 0 ? (
           <Card>
-            <Empty description="Chưa có công đoạn được giao" />
+            <Empty description="Chưa có công đoạn phù hợp" />
           </Card>
         ) : (
           <div
@@ -132,7 +148,7 @@ export default function JobsPage() {
               gap: 12,
             }}
           >
-            {data.map((item) => (
+            {filteredData.map((item) => (
               <Card
                 key={item.id}
                 size="small"
@@ -166,7 +182,7 @@ export default function JobsPage() {
                     type="primary"
                     onClick={() => setSelected(item)}
                   >
-                    Báo cáo
+                    Ghi sổ
                   </Button>,
                 ]}
               >

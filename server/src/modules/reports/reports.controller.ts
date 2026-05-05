@@ -37,6 +37,12 @@ export class ReportsController {
     return this.service.findOne(id);
   }
 
+  // ================= CREATE BULK
+  @Post('bulk')
+  createBulk(@Body() body: any) {
+    return this.service.createBulk(body);
+  }
+
   // ================= CREATE
   @Post()
   create(@Body() body: any) {
