@@ -14,7 +14,7 @@ import {
   Upload,
   message,
 } from "antd";
-import type { UploadFile } from "antd";
+import type { TablePaginationConfig, UploadFile } from "antd";
 import { useEffect, useState } from "react";
 import { resolveFileUrl } from "@/services/api";
 import {
@@ -22,6 +22,7 @@ import {
   deleteOperation,
   getOperations,
   updateOperation,
+  OperationListParams,
 } from "@/services/operation.service";
 import { getProducts } from "@/services/product.service";
 import type { Operation, Product } from "@/services/types";
@@ -36,21 +37,35 @@ type OperationFormValues = {
 export default function OperationsPage() {
   const [data, setData] = useState<Operation[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
+  const [total, setTotal] = useState(0);
+  const [filters, setFilters] = useState<OperationListParams>({
+    page: 1,
+    limit: 10,
+  });
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Operation | null>(null);
   const [form] = Form.useForm<OperationFormValues>();
 
-  const fetchData = async () => {
+  const fetchData = async (params?: OperationListParams) => {
     setLoading(true);
+
     try {
+      const merged = {
+        ...filters,
+        ...params,
+      };
+
       const [operationsRes, productsRes] = await Promise.all([
-        getOperations({ limit: 100 }),
+        getOperations(merged),
         getProducts({ limit: 100 }),
       ]);
+
       setData(operationsRes.data);
       setProducts(productsRes.data);
+      setTotal(operationsRes.total);
+      setFilters(merged);
     } finally {
       setLoading(false);
     }
@@ -59,6 +74,29 @@ export default function OperationsPage() {
   useEffect(() => {
     fetchData();
   }, []);
+
+  const handleProductFilter = async (productId?: number) => {
+    await fetchData({
+      product_id: productId,
+    });
+  };
+
+  const handleKeywordSearch = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    await fetchData({
+      keyword: event.target.value || undefined,
+    });
+  };
+
+  const handleTableChange = async (
+    pagination: TablePaginationConfig,
+  ) => {
+    await fetchData({
+      page: pagination.current,
+      limit: pagination.pageSize,
+    });
+  };
 
   const openCreate = () => {
     setEditing(null);
@@ -120,10 +158,37 @@ export default function OperationsPage() {
         </Button>
       </Space>
 
+      <Space wrap>
+        <Select
+          allowClear
+          placeholder="Lọc sản phẩm"
+          style={{ width: 240 }}
+          onChange={handleProductFilter}
+          options={products.map((product) => ({
+            value: product.id,
+            label: `${product.code} - ${product.name}`,
+          }))}
+        />
+
+        <Input
+          allowClear
+          placeholder="Tìm tên công đoạn"
+          style={{ width: 260 }}
+          onChange={handleKeywordSearch}
+        />
+      </Space>
+
       <Table
         loading={loading}
         dataSource={data}
         rowKey="id"
+        onChange={handleTableChange}
+        pagination={{
+          current: filters.page,
+          pageSize: filters.limit,
+          total,
+          showSizeChanger: true,
+        }}
         columns={[
           {
             title: "Ảnh",

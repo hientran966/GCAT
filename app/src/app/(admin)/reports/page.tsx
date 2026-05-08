@@ -11,11 +11,15 @@ import {
   Table,
   Tag,
   message,
+  DatePicker,
+  TablePaginationConfig,
 } from "antd";
 import { useEffect, useState } from "react";
+import dayjs from "dayjs";
 import {
   createReport,
   getReports,
+  ReportListParams,
   updateReport,
 } from "@/services/report.service";
 import { getAssignments } from "@/services/assignment.service";
@@ -36,21 +40,35 @@ const statusColor: Record<string, string> = {
 export default function ReportsPage() {
   const [data, setData] = useState<Report[]>([]);
   const [assignments, setAssignments] = useState<Assignment[]>([]);
+  const [total, setTotal] = useState(0);
+  const [filters, setFilters] = useState<ReportListParams>({
+    page: 1,
+    limit: 10,
+  });
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Report | null>(null);
   const [form] = Form.useForm<ReportFormValues>();
 
-  const fetchData = async () => {
+  const fetchData = async (params?: ReportListParams) => {
     setLoading(true);
+
     try {
+      const merged = {
+        ...filters,
+        ...params,
+      };
+
       const [reportsRes, assignmentsRes] = await Promise.all([
-        getReports({ limit: 100 }),
+        getReports(merged),
         getAssignments({ limit: 100 }),
       ]);
+
       setData(reportsRes.data);
       setAssignments(assignmentsRes.data);
+      setTotal(reportsRes.total);
+      setFilters(merged);
     } finally {
       setLoading(false);
     }
@@ -59,6 +77,34 @@ export default function ReportsPage() {
   useEffect(() => {
     fetchData();
   }, []);
+
+  const handleWorkerFilter = async (workerId?: number) => {
+    await fetchData({
+      worker_id: workerId,
+    });
+  };
+
+  const handleDateFilter = async (
+    dates: [dayjs.Dayjs | null, dayjs.Dayjs | null] | null,
+  ) => {
+    await fetchData({
+      from_date: dates?.[0]
+        ? dates[0].format("YYYY-MM-DD")
+        : undefined,
+      to_date: dates?.[1]
+        ? dates[1].format("YYYY-MM-DD")
+        : undefined,
+    });
+  };
+
+  const handleTableChange = async (
+    pagination: TablePaginationConfig,
+  ) => {
+    await fetchData({
+      page: pagination.current,
+      limit: pagination.pageSize,
+    });
+  };
 
   const openCreate = () => {
     setEditing(null);
@@ -105,10 +151,42 @@ export default function ReportsPage() {
         </Button>
       </Space>
 
+      <Space wrap>
+        <Select
+          allowClear
+          placeholder="Lọc công nhân"
+          style={{ width: 250 }}
+          onChange={handleWorkerFilter}
+          options={[
+            ...new Map(
+              assignments.map((a) => [
+                a.worker_id,
+                {
+                  value: a.worker_id,
+                  label: a.worker_name ?? "N/A",
+                },
+              ]),
+            ).values(),
+          ]}
+        />
+
+        <DatePicker.RangePicker
+          format="DD/MM/YYYY"
+          onChange={handleDateFilter}
+        />
+      </Space>
+
       <Table
         loading={loading}
         dataSource={data}
         rowKey="id"
+        onChange={handleTableChange}
+        pagination={{
+          current: filters.page,
+          pageSize: filters.limit,
+          total,
+          showSizeChanger: true,
+        }}
         columns={[
           { title: "Công nhân", dataIndex: "worker_name" },
           { title: "Công đoạn", dataIndex: "operation_name" },

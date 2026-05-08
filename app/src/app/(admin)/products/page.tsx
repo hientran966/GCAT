@@ -13,13 +13,14 @@ import {
   Upload,
   message,
 } from "antd";
-import type { UploadFile } from "antd";
+import type { TablePaginationConfig, UploadFile } from "antd";
 import { useEffect, useState } from "react";
 import {
   createProduct,
   deleteProduct,
   getProducts,
   updateProduct,
+  ProductListParams,
 } from "@/services/product.service";
 import { resolveFileUrl } from "@/services/api";
 import type { Product } from "@/services/types";
@@ -34,17 +35,31 @@ type ProductFormValues = {
 
 export default function ProductsPage() {
   const [data, setData] = useState<Product[]>([]);
+  const [total, setTotal] = useState(0);
+  const [filters, setFilters] = useState<ProductListParams>({
+    page: 1,
+    limit: 10,
+  });
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Product | null>(null);
   const [form] = Form.useForm<ProductFormValues>();
 
-  const fetchData = async () => {
+  const fetchData = async (params?: ProductListParams) => {
     setLoading(true);
+
     try {
-    const res = await getProducts();
-    setData(res.data);
+      const merged = {
+        ...filters,
+        ...params,
+      };
+
+      const res = await getProducts(merged);
+
+      setData(res.data);
+      setTotal(res.total);
+      setFilters(merged);
     } finally {
       setLoading(false);
     }
@@ -53,6 +68,23 @@ export default function ProductsPage() {
   useEffect(() => {
     fetchData();
   }, []);
+
+  const handleKeywordSearch = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    await fetchData({
+      keyword: event.target.value || undefined,
+    });
+  };
+
+  const handleTableChange = async (
+    pagination: TablePaginationConfig,
+  ) => {
+    await fetchData({
+      page: pagination.current,
+      limit: pagination.pageSize,
+    });
+  };
 
   const openCreate = () => {
     setEditing(null);
@@ -118,10 +150,24 @@ export default function ProductsPage() {
         </Button>
       </Space>
 
+      <Input
+        allowClear
+        placeholder="Tìm tên sản phẩm"
+        style={{ width: 280 }}
+        onChange={handleKeywordSearch}
+      />
+
       <Table
         loading={loading}
         dataSource={data}
         rowKey="id"
+        onChange={handleTableChange}
+        pagination={{
+          current: filters.page,
+          pageSize: filters.limit,
+          total,
+          showSizeChanger: true,
+        }}
         columns={[
           {
             title: "Ảnh",

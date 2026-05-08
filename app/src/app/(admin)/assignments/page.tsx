@@ -8,6 +8,7 @@ import {
   Select,
   Space,
   Table,
+  TablePaginationConfig,
   message,
 } from "antd";
 import { useEffect, useState } from "react";
@@ -15,10 +16,17 @@ import {
   createAssignment,
   deleteAssignment,
   getAssignments,
+  AssignmentListParams,
 } from "@/services/assignment.service";
 import { getOperations } from "@/services/operation.service";
+import { getProducts } from "@/services/product.service";
 import { getUsers } from "@/services/user.service";
-import type { Assignment, Operation, User } from "@/services/types";
+import type {
+  Assignment,
+  Operation,
+  Product,
+  User,
+} from "@/services/types";
 
 type AssignmentFormValues = {
   worker_id: number;
@@ -28,23 +36,45 @@ type AssignmentFormValues = {
 export default function AssignmentsPage() {
   const [data, setData] = useState<Assignment[]>([]);
   const [workers, setWorkers] = useState<User[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [total, setTotal] = useState(0);
+  const [filters, setFilters] = useState<AssignmentListParams>({
+    page: 1,
+    limit: 10,
+  });
   const [operations, setOperations] = useState<Operation[]>([]);
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [open, setOpen] = useState(false);
   const [form] = Form.useForm<AssignmentFormValues>();
 
-  const fetchData = async () => {
+  const fetchData = async (params?: AssignmentListParams) => {
     setLoading(true);
+
     try {
-      const [assignmentsRes, workersRes, operationsRes] = await Promise.all([
-        getAssignments({ limit: 100 }),
+      const merged = {
+        ...filters,
+        ...params,
+      };
+
+      const [
+        assignmentsRes,
+        workersRes,
+        operationsRes,
+        productsRes,
+      ] = await Promise.all([
+        getAssignments(merged),
         getUsers({ role: "worker", limit: 100 }),
         getOperations({ limit: 100 }),
+        getProducts({ limit: 100 }),
       ]);
+
       setData(assignmentsRes.data);
       setWorkers(workersRes.data);
       setOperations(operationsRes.data);
+      setProducts(productsRes.data);
+      setTotal(assignmentsRes.total);
+      setFilters(merged);
     } finally {
       setLoading(false);
     }
@@ -53,6 +83,27 @@ export default function AssignmentsPage() {
   useEffect(() => {
     fetchData();
   }, []);
+
+  const handleWorkerFilter = async (workerId?: number) => {
+    await fetchData({
+      worker_id: workerId,
+    });
+  };
+
+  const handleProductFilter = async (productId?: number) => {
+    await fetchData({
+      product_id: productId,
+    });
+  };
+
+  const handleTableChange = async (
+    pagination: TablePaginationConfig,
+  ) => {
+    await fetchData({
+      page: pagination.current,
+      limit: pagination.pageSize,
+    });
+  };
 
   const handleSubmit = async () => {
     const values = await form.validateFields();
@@ -90,10 +141,41 @@ export default function AssignmentsPage() {
         </Button>
       </Space>
 
+      <Space wrap>
+        <Select
+          allowClear
+          placeholder="Lọc công nhân"
+          style={{ width: 240 }}
+          onChange={handleWorkerFilter}
+          options={workers.map((worker) => ({
+            value: worker.id,
+            label: `${worker.name} - ${worker.phone}`,
+          }))}
+        />
+
+        <Select
+          allowClear
+          placeholder="Lọc sản phẩm"
+          style={{ width: 240 }}
+          onChange={handleProductFilter}
+          options={products.map((product) => ({
+            value: product.id,
+            label: `${product.code} - ${product.name}`,
+          }))}
+        />
+      </Space>
+
       <Table
         loading={loading}
         dataSource={data}
         rowKey="id"
+        onChange={handleTableChange}
+        pagination={{
+          current: filters.page,
+          pageSize: filters.limit,
+          total,
+          showSizeChanger: true,
+        }}
         columns={[
           { title: "Công nhân", dataIndex: "worker_name" },
           { title: "Công đoạn", dataIndex: "operation_name" },

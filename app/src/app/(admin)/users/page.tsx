@@ -9,6 +9,7 @@ import {
   Select,
   Space,
   Table,
+  TablePaginationConfig,
   Tag,
   message,
 } from "antd";
@@ -19,6 +20,7 @@ import {
   deleteUser,
   getUsers,
   updateUser,
+  UserListParams,
 } from "@/services/user.service";
 import type { Role, User } from "@/services/types";
 import { useRouter } from "next/navigation";
@@ -44,6 +46,11 @@ const roleColor: Record<Role, string> = {
 export default function UsersPage() {
   const router = useRouter();
   const [data, setData] = useState<User[]>([]);
+  const [total, setTotal] = useState(0);
+  const [filters, setFilters] = useState<UserListParams>({
+    page: 1,
+    limit: 10,
+  });
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [open, setOpen] = useState(false);
@@ -52,11 +59,20 @@ export default function UsersPage() {
   const [form] = Form.useForm<UserFormValues>();
   const [passwordForm] = Form.useForm<PasswordFormValues>();
 
-  const fetchData = async () => {
+  const fetchData = async (params?: UserListParams) => {
     setLoading(true);
+
     try {
-      const res = await getUsers({ limit: 100 });
+      const merged = {
+        ...filters,
+        ...params,
+      };
+
+      const res = await getUsers(merged);
+
       setData(res.data);
+      setTotal(res.total);
+      setFilters(merged);
     } finally {
       setLoading(false);
     }
@@ -65,6 +81,31 @@ export default function UsersPage() {
   useEffect(() => {
     fetchData();
   }, []);
+
+  const handleRoleFilter = async (role?: Role) => {
+    await fetchData({
+      role,
+      page: 1,
+    });
+  };
+
+  const handleKeywordSearch = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    await fetchData({
+      keyword: event.target.value || undefined,
+      page: 1,
+    });
+  };
+
+  const handleTableChange = async (
+    pagination: TablePaginationConfig,
+  ) => {
+    await fetchData({
+      page: pagination.current,
+      limit: pagination.pageSize,
+    });
+  };
 
   const openCreate = () => {
     setEditing(null);
@@ -146,10 +187,38 @@ export default function UsersPage() {
         </Button>
       </Space>
 
+      <Space wrap>
+        <Select
+          allowClear
+          placeholder="Lọc vai trò"
+          style={{ width: 180 }}
+          onChange={handleRoleFilter}
+          options={[
+            { value: "admin", label: "Admin" },
+            { value: "manager", label: "Manager" },
+            { value: "worker", label: "Worker" },
+          ]}
+        />
+
+        <Input
+          allowClear
+          placeholder="Tìm tên hoặc số điện thoại"
+          style={{ width: 260 }}
+          onChange={handleKeywordSearch}
+        />
+      </Space>
+
       <Table
         loading={loading}
         dataSource={data}
         rowKey="id"
+        onChange={handleTableChange}
+        pagination={{
+          current: filters.page,
+          pageSize: filters.limit,
+          total,
+          showSizeChanger: true,
+        }}
         onRow={(record) => ({
           onClick: () => router.push(`/users/${record.id}`),
           style: { cursor: "pointer" },
