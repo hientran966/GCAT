@@ -60,13 +60,9 @@ export default function ReportsPage() {
         ...params,
       };
 
-      const [reportsRes, assignmentsRes] = await Promise.all([
-        getReports(merged),
-        getAssignments({ limit: 100 }),
-      ]);
+      const reportsRes = await getReports(merged);
 
       setData(reportsRes.data);
-      setAssignments(assignmentsRes.data);
       setTotal(reportsRes.total);
       setFilters(merged);
     } finally {
@@ -74,8 +70,14 @@ export default function ReportsPage() {
     }
   };
 
+  const fetchAssignments = async () => {
+    const assignmentsRes = await getAssignments({ limit: 100 });
+    setAssignments(assignmentsRes.data);
+  };
+
   useEffect(() => {
     fetchData();
+    fetchAssignments();
   }, []);
 
   const handleWorkerFilter = async (workerId?: number) => {

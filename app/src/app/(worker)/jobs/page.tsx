@@ -53,17 +53,23 @@ export default function JobsPage() {
   const [form] = Form.useForm<AssignmentFormValues>();
 
   const fetchOptions = async () => {
-    const [workersRes, operationsRes] = await Promise.all([
+    const [workersRes, operationsRes] = await Promise.allSettled([
       getUsers({ role: "worker", limit: 100 }),
       getOperations({ limit: 100 }),
     ]);
 
-    setWorkers(workersRes.data);
-    setOperations(operationsRes.data);
+    const workersData = workersRes.status === "fulfilled" ? workersRes.value.data : [];
+
+    if (workersRes.status === "fulfilled") {
+      setWorkers(workersData);
+    }
+    if (operationsRes.status === "fulfilled") {
+      setOperations(operationsRes.value.data);
+    }
 
     const storedUser = readStoredUser();
     const defaultWorkerId =
-      storedUser?.role === "worker" ? storedUser.id : workersRes.data[0]?.id;
+      storedUser?.role === "worker" ? storedUser.id : workersData[0]?.id;
     setWorkerId((current) => current ?? defaultWorkerId);
   };
 

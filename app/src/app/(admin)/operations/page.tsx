@@ -71,8 +71,14 @@ export default function OperationsPage() {
     }
   };
 
+  const fetchProducts = async () => {
+    const productsRes = await getProducts({ limit: 100 });
+    setProducts(productsRes.data);
+  };
+
   useEffect(() => {
     fetchData();
+    fetchProducts();
   }, []);
 
   const handleProductFilter = async (productId?: number) => {

@@ -1,9 +1,10 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { Input, Layout, Menu } from "antd";
+import { Button, Input, Layout, Menu } from "antd";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import ReportBookButton from "@/components/worker/report-book";
+import { useAuthStore } from "@/store/auth.store";
 import styles from "./worker-layout.module.css";
 
 const { Header, Content } = Layout;
@@ -12,6 +13,7 @@ export default function JobsLayout({ children }: { children: ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const logout = useAuthStore((state) => state.logout);
 
   const handleSearch = (value: string) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -20,6 +22,11 @@ export default function JobsLayout({ children }: { children: ReactNode }) {
 
     const query = params.toString();
     router.push(query ? `${pathname}?${query}` : pathname);
+  };
+
+  const handleLogout = () => {
+    logout();
+    router.replace("/login");
   };
 
   return (
@@ -46,6 +53,9 @@ export default function JobsLayout({ children }: { children: ReactNode }) {
         />
         <div className={styles.book}>
           <ReportBookButton />
+          <Button danger onClick={handleLogout}>
+            Đăng xuất
+          </Button>
         </div>
       </Header>
 

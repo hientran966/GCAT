@@ -57,22 +57,9 @@ export default function AssignmentsPage() {
         ...params,
       };
 
-      const [
-        assignmentsRes,
-        workersRes,
-        operationsRes,
-        productsRes,
-      ] = await Promise.all([
-        getAssignments(merged),
-        getUsers({ role: "worker", limit: 100 }),
-        getOperations({ limit: 100 }),
-        getProducts({ limit: 100 }),
-      ]);
+      const assignmentsRes = await getAssignments(merged);
 
       setData(assignmentsRes.data);
-      setWorkers(workersRes.data);
-      setOperations(operationsRes.data);
-      setProducts(productsRes.data);
       setTotal(assignmentsRes.total);
       setFilters(merged);
     } finally {
@@ -80,8 +67,27 @@ export default function AssignmentsPage() {
     }
   };
 
+  const fetchOptions = async () => {
+    const [workersRes, operationsRes, productsRes] = await Promise.allSettled([
+      getUsers({ role: "worker", limit: 100 }),
+      getOperations({ limit: 100 }),
+      getProducts({ limit: 100 }),
+    ]);
+
+    if (workersRes.status === "fulfilled") {
+      setWorkers(workersRes.value.data);
+    }
+    if (operationsRes.status === "fulfilled") {
+      setOperations(operationsRes.value.data);
+    }
+    if (productsRes.status === "fulfilled") {
+      setProducts(productsRes.value.data);
+    }
+  };
+
   useEffect(() => {
     fetchData();
+    fetchOptions();
   }, []);
 
   const handleWorkerFilter = async (workerId?: number) => {

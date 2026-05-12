@@ -1,4 +1,4 @@
-CREATE DATABASE gcat;
+CREATE DATABASE IF NOT EXISTS gcat;
 USE gcat;
 
 CREATE TABLE users (
@@ -43,7 +43,7 @@ CREATE TABLE assignments (
     worker_id INT NOT NULL,
     operation_id INT NOT NULL,
 
-    created_by INT, -- manager
+    created_by INT,
 
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     deleted_at TIMESTAMP NULL,
@@ -75,6 +75,6 @@ INSERT INTO users (phone, name, password, role)
 VALUES (
     'admin',
     'Administrator',
-    '$2a$10$xWxH3nD1SV6p/PEboLJeu.A9N075x5NGEMSx2GlMh1.zabRpv4h5e', -- 123456
+    '$2a$10$xWxH3nD1SV6p/PEboLJeu.A9N075x5NGEMSx2GlMh1.zabRpv4h5e',
     'admin'
 );

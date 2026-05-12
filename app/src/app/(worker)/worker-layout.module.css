@@ -39,6 +39,7 @@
   grid-area: book;
   display: flex;
   align-items: center;
+  gap: 8px;
 }
 
 .content {
