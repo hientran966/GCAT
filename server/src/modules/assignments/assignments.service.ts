@@ -145,9 +145,57 @@ export class AssignmentsService {
       throw new BadRequestException('Operation not found');
     }
 
+    return this.insertAssignment(worker_id, operation_id);
+  }
+
+  async createForUser(workerId: number, operationId: number) {
+    if (!operationId) {
+      throw new BadRequestException('Missing required fields');
+    }
+
+    const [operation]: any = await this.db.execute(
+      `
+      SELECT id
+      FROM operations
+      WHERE id = ? AND is_open = TRUE AND deleted_at IS NULL
+      `,
+      [operationId],
+    );
+
+    if (!operation.length) {
+      throw new BadRequestException('Operation is not open');
+    }
+
+    return this.insertAssignment(workerId, operationId);
+  }
+
+  private async insertAssignment(worker_id: number, operation_id: number) {
+    const [worker]: any = await this.db.execute(
+      `SELECT id FROM users WHERE id = ? AND role = 'worker' AND deleted_at IS NULL`,
+      [worker_id],
+    );
+
+    if (!worker.length) {
+      throw new BadRequestException('Worker not found');
+    }
+
+    const [duplicate]: any = await this.db.execute(
+      `
+      SELECT id
+      FROM assignments
+      WHERE worker_id = ? AND operation_id = ? AND deleted_at IS NULL
+      LIMIT 1
+      `,
+      [worker_id, operation_id],
+    );
+
+    if (duplicate.length) {
+      throw new BadRequestException('Assignment already exists');
+    }
+
     const [res]: any = await this.db.execute(
       `
-      INSERT INTO assignments 
+      INSERT INTO assignments
       (worker_id, operation_id)
       VALUES (?, ?)
       `,

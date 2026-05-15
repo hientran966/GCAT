@@ -41,6 +41,8 @@ export interface Operation {
   image?: string | null;
   price: number | string;
   product_code?: string;
+  product_name?: string;
+  is_open?: boolean;
   created_at?: string;
   updated_at?: string | null;
   deleted_at?: string | null;

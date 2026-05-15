@@ -36,11 +36,12 @@ export default function JobsLayout({ children }: { children: ReactNode }) {
         <Menu
           className={styles.nav}
           mode="horizontal"
-          selectedKeys={[pathname === "/income" ? "income" : "jobs"]}
+          selectedKeys={[pathname === "/open" ? "open" : pathname === "/income" ? "income" : "jobs"]}
           onClick={(event) => router.push(`/${event.key}`)}
           items={[
             { key: "jobs", label: "Công việc" },
             { key: "income", label: "Thu nhập" },
+            { key: "open", label: "Tìm công đoạn" },
           ]}
           style={{ borderBottom: 0 }}
         />
@@ -53,6 +54,9 @@ export default function JobsLayout({ children }: { children: ReactNode }) {
         />
         <div className={styles.book}>
           <ReportBookButton />
+          <Button onClick={() => router.push("/products")}>
+            Admin
+          </Button>
           <Button danger onClick={handleLogout}>
             Đăng xuất
           </Button>

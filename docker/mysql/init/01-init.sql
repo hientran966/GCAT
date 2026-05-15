@@ -31,6 +31,7 @@ CREATE TABLE operations (
     name VARCHAR(255) NOT NULL,
     image VARCHAR(255),
     price DECIMAL(10,2) NOT NULL,
+    is_open BOOLEAN DEFAULT TRUE,
 
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     deleted_at TIMESTAMP NULL,

@@ -30,6 +30,12 @@ export class AssignmentsController {
     return this.service.getByUser(req.user.id);
   }
 
+  // ================= SELF ASSIGN
+  @Post('me')
+  createForCurrentUser(@Req() req: any, @Body() body: any) {
+    return this.service.createForUser(req.user.id, body.operation_id);
+  }
+
   // ================= GET ONE
   @Get(':id')
   getOne(@Param('id', ParseIntPipe) id: number) {

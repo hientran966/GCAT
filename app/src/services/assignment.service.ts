@@ -34,6 +34,13 @@ export const getUserAssignments = async (): Promise<Assignment[]> => {
   return res.data;
 }
 
+export const createMyAssignment = async (
+  operationId: Id,
+): Promise<Assignment> => {
+  const res = await api.post("/assignments/me", { operation_id: operationId });
+  return res.data;
+};
+
 export const createAssignment = async (
   data: AssignmentPayload,
 ): Promise<Assignment> => {

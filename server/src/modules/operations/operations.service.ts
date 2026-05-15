@@ -11,7 +11,8 @@ export class OperationsService {
 
   // ================= GET ALL
   async findAll(query: any) {
-    const { page, limit, product_id, keyword } = query;
+    const { page, limit, product_id, keyword, is_open, min_price, max_price } =
+      query;
 
     const pageNum = Number(page) || 1;
     const limitNum = Number(limit) || 10;
@@ -27,13 +28,27 @@ export class OperationsService {
     }
 
     if (keyword) {
-      where += ` AND o.name LIKE ?`;
-      params.push(`%${keyword}%`);
+      where += ` AND (o.name LIKE ? OR p.code LIKE ? OR p.name LIKE ?)`;
+      params.push(`%${keyword}%`, `%${keyword}%`, `%${keyword}%`);
+    }
+
+    if (is_open === 'true') {
+      where += ` AND o.is_open = TRUE`;
+    }
+
+    if (min_price) {
+      where += ` AND o.price >= ?`;
+      params.push(Number(min_price));
+    }
+
+    if (max_price) {
+      where += ` AND o.price <= ?`;
+      params.push(Number(max_price));
     }
 
     const [rows] = await this.db.execute(
       `
-      SELECT o.*, p.code as product_code
+      SELECT o.*, p.code as product_code, p.name as product_name
       FROM operations o
       LEFT JOIN products p ON p.id = o.product_id
       ${where}
@@ -47,6 +62,7 @@ export class OperationsService {
       `
       SELECT COUNT(*) as total
       FROM operations o
+      LEFT JOIN products p ON p.id = o.product_id
       ${where}
       `,
       params,
@@ -64,7 +80,7 @@ export class OperationsService {
   async findOne(id: number) {
     const [rows]: any = await this.db.execute(
       `
-      SELECT o.*, p.code as product_code
+      SELECT o.*, p.code as product_code, p.name as product_name
       FROM operations o
       LEFT JOIN products p ON p.id = o.product_id
       WHERE o.id = ? AND o.deleted_at IS NULL
@@ -95,7 +111,7 @@ export class OperationsService {
 
   // ================= CREATE
   async create(data: any, file?: Express.Multer.File) {
-    const { name, price, product_id } = data;
+    const { name, price, product_id, is_open } = data;
 
     if (!name || !price || !product_id) {
       throw new BadRequestException('Missing required fields');
@@ -115,10 +131,10 @@ export class OperationsService {
 
     const [res]: any = await this.db.execute(
       `
-      INSERT INTO operations (name, price, product_id, image)
-      VALUES (?, ?, ?, ?)
+      INSERT INTO operations (name, price, product_id, image, is_open)
+      VALUES (?, ?, ?, ?, ?)
       `,
-      [name, price, product_id, image],
+      [name, price, product_id, image, is_open === 'true' ? true : false],
     );
 
     return {
@@ -127,12 +143,13 @@ export class OperationsService {
       price,
       product_id,
       image,
+      is_open: is_open === 'true' ? true : false,
     };
   }
 
   // ================= UPDATE
   async update(id: number, data: any, file?: Express.Multer.File) {
-    const { name, price, product_id } = data;
+    const { name, price, product_id, is_open } = data;
 
     const [exist]: any = await this.db.execute(
       `SELECT * FROM operations WHERE id = ? AND deleted_at IS NULL`,
@@ -159,7 +176,7 @@ export class OperationsService {
     await this.db.execute(
       `
       UPDATE operations
-      SET name = ?, price = ?, product_id = ?, image = ?
+      SET name = ?, price = ?, product_id = ?, image = ?, is_open = ?
       WHERE id = ?
       `,
       [
@@ -167,6 +184,7 @@ export class OperationsService {
         price || current.price,
         product_id || current.product_id,
         image,
+        is_open === 'true' ? true : false,
         id,
       ],
     );

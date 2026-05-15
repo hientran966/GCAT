@@ -12,6 +12,9 @@ import {
 export interface OperationListParams extends PaginationParams {
   product_id?: Id;
   keyword?: string;
+  is_open?: boolean;
+  min_price?: number;
+  max_price?: number;
 }
 
 export interface OperationPayload {
@@ -44,6 +47,15 @@ export const getUserOperations = async (): Promise<Operation[]> => {
   const res = await api.get(`/operations/me`);
   return res.data;
 }
+
+export const getOpenOperations = async (
+  params?: OperationListParams,
+): Promise<PaginatedResponse<Operation>> => {
+  const res = await api.get("/operations", {
+    params: { ...params, is_open: true },
+  });
+  return res.data;
+};
 
 export const createOperation = async (
   data: OperationPayload | FormData,

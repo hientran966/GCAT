@@ -2,6 +2,7 @@
 
 import {
   Button,
+  Checkbox,
   Form,
   Image,
   Input,
@@ -31,6 +32,7 @@ type OperationFormValues = {
   name: string;
   price: number;
   product_id: number;
+  is_open: boolean;
   file?: UploadFile[];
 };
 
@@ -117,6 +119,7 @@ export default function OperationsPage() {
       price: Number(record.price),
       product_id: record.product_id,
       file: [],
+      is_open: record.is_open,
     });
     setOpen(true);
   };
@@ -131,6 +134,7 @@ export default function OperationsPage() {
         name: values.name,
         price: values.price,
         product_id: values.product_id,
+        is_open: values.is_open,
         file,
       };
 
@@ -219,6 +223,11 @@ export default function OperationsPage() {
             render: (price) => Number(price).toLocaleString("vi-VN"),
           },
           {
+            title: "Trạng thái",
+            dataIndex: "is_open",
+            render: (is_open) => (is_open ? "Mở" : "Đóng"),
+          },
+          {
             title: "Thao tác",
             width: 160,
             render: (_, record) => (
@@ -264,6 +273,13 @@ export default function OperationsPage() {
           </Form.Item>
           <Form.Item name="price" label="Đơn giá" rules={[{ required: true }]}>
             <InputNumber min={0} style={{ width: "100%" }} />
+          </Form.Item>
+          <Form.Item name="is_open" label="Cho phép tìm kiếm?">
+            <Checkbox
+              onChange={(e) => {
+                form.setFieldValue("is_open", e.target.checked);
+              }}
+            />
           </Form.Item>
           <Form.Item
             name="file"

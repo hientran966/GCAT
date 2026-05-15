@@ -169,7 +169,7 @@ export default function JobsPage() {
                   ) : (
                     <div
                       style={{
-                        height: 120,
+                        height: 160,
                         background: "#f0f2f5",
                         display: "flex",
                         alignItems: "center",
@@ -196,17 +196,14 @@ export default function JobsPage() {
                   <Space
                     style={{ justifyContent: "space-between", width: "100%" }}
                   >
-                    <Tag color="blue">{item.product_code ?? "N/A"}</Tag>
                     <Typography.Text strong>
                       {Number(item.price ?? 0).toLocaleString("vi-VN")}
                     </Typography.Text>
                   </Space>
                   <Typography.Title level={5} style={{ margin: 0 }}>
-                    {item.operation_name}
+                    {item.product_code ?? "N/A"} - {item.operation_name}
                   </Typography.Title>
-                  <Typography.Text type="secondary">
-                    {item.product_name ?? "Sản phẩm không xác định"}
-                  </Typography.Text>
+
                 </Space>
               </Card>
             ))}
